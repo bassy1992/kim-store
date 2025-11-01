@@ -192,10 +192,13 @@ REST_FRAMEWORK = {
 }
 
 # CORS settings
-CORS_ALLOWED_ORIGINS = config(
-    'CORS_ALLOWED_ORIGINS',
-    default='http://localhost:5173,http://localhost:3000,http://localhost:8080'
-).split(',')
+CORS_ALLOWED_ORIGINS = [
+    origin.strip() 
+    for origin in config(
+        'CORS_ALLOWED_ORIGINS',
+        default='http://localhost:5173,http://localhost:3000,http://localhost:8080'
+    ).split(',')
+]
 
 CORS_ALLOW_ALL_ORIGINS = False
 
