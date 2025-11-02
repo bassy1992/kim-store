@@ -28,6 +28,15 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,.railway.app,.up.railway.app').split(',')
 
+# CSRF Settings
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in config(
+        'CSRF_TRUSTED_ORIGINS',
+        default='https://*.railway.app,https://*.up.railway.app,https://kim-store-production.up.railway.app'
+    ).split(',')
+    if origin.strip()
+]
 
 # Application definition
 
