@@ -76,19 +76,19 @@ export default function Index() {
   return (
     <>
       {/* Hero Slider */}
-      <section className="relative h-[400px] xs:h-[450px] sm:h-[500px] md:h-[600px] lg:h-[700px] overflow-hidden">
+      <section className="relative h-[400px] xs:h-[450px] sm:h-[500px] md:h-[600px] lg:h-[700px] overflow-hidden w-full">
         {/* Slides */}
         {heroSlides.map((slide, index) => (
           <div
             key={slide.id}
             className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
               index === currentSlide 
-                ? 'opacity-100 scale-100' 
-                : 'opacity-0 scale-105'
+                ? 'opacity-100 scale-100 z-[1]' 
+                : 'opacity-0 scale-105 z-0 pointer-events-none'
             }`}
           >
             {/* Background Image */}
-            <div className="absolute inset-0">
+            <div className="absolute inset-0 z-0">
               <img
                 src={slide.image}
                 alt={slide.title}
@@ -99,8 +99,8 @@ export default function Index() {
             </div>
 
             {/* Content */}
-            <div className="relative h-full w-full flex items-center justify-center sm:justify-start">
-              <div className="w-full max-w-[calc(100%-1.5rem)] xs:max-w-[calc(100%-2rem)] sm:max-w-2xl mx-auto sm:ml-6 md:ml-8 lg:ml-12 space-y-2 xs:space-y-3 sm:space-y-4 md:space-y-6 text-white text-center sm:text-left animate-fade-in">
+            <div className="relative h-full w-full flex items-center justify-center sm:justify-start z-10 px-3 xs:px-4 sm:px-6 md:px-8">
+              <div className="w-full max-w-full sm:max-w-2xl space-y-2 xs:space-y-3 sm:space-y-4 md:space-y-6 text-white text-center sm:text-left animate-fade-in">
                 {/* Badge */}
                 <div className="inline-flex items-center gap-1 xs:gap-1.5 sm:gap-2 px-2 xs:px-2.5 py-0.5 xs:py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-[9px] xs:text-[10px] sm:text-xs md:text-sm font-medium">
                   <svg className="w-2.5 h-2.5 xs:w-3 xs:h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -145,7 +145,7 @@ export default function Index() {
         {/* Navigation Arrows */}
         <button
           onClick={prevSlide}
-          className="absolute left-1 xs:left-2 sm:left-4 top-1/2 -translate-y-1/2 p-1.5 xs:p-2 sm:p-3 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all hover:scale-110 z-10 active:scale-95"
+          className="absolute left-1 xs:left-2 sm:left-4 top-1/2 -translate-y-1/2 p-1.5 xs:p-2 sm:p-3 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all hover:scale-110 z-20 active:scale-95"
           aria-label="Previous slide"
         >
           <svg className="w-3 h-3 xs:w-4 xs:h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
@@ -154,7 +154,7 @@ export default function Index() {
         </button>
         <button
           onClick={nextSlide}
-          className="absolute right-1 xs:right-2 sm:right-4 top-1/2 -translate-y-1/2 p-1.5 xs:p-2 sm:p-3 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all hover:scale-110 z-10 active:scale-95"
+          className="absolute right-1 xs:right-2 sm:right-4 top-1/2 -translate-y-1/2 p-1.5 xs:p-2 sm:p-3 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all hover:scale-110 z-20 active:scale-95"
           aria-label="Next slide"
         >
           <svg className="w-3 h-3 xs:w-4 xs:h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
@@ -163,7 +163,7 @@ export default function Index() {
         </button>
 
         {/* Dots Indicator */}
-        <div className="absolute bottom-3 xs:bottom-4 sm:bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-1.5 xs:gap-2 sm:gap-3 z-10">
+        <div className="absolute bottom-3 xs:bottom-4 sm:bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-1.5 xs:gap-2 sm:gap-3 z-20">
           {heroSlides.map((_, index) => (
             <button
               key={index}
