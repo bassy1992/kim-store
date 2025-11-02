@@ -76,7 +76,7 @@ export default function Index() {
   return (
     <>
       {/* Hero Slider */}
-      <section className="relative h-[500px] sm:h-[600px] md:h-[700px] overflow-hidden">
+      <section className="relative h-[450px] sm:h-[550px] md:h-[650px] lg:h-[700px] overflow-hidden">
         {/* Slides */}
         {heroSlides.map((slide, index) => (
           <div
@@ -92,31 +92,31 @@ export default function Index() {
               <img
                 src={slide.image}
                 alt={slide.title}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover object-center"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40 md:from-black/70 md:via-black/50 md:to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80 sm:bg-gradient-to-r sm:from-black/80 sm:via-black/60 sm:to-black/40 md:from-black/70 md:via-black/50 md:to-transparent" />
             </div>
 
             {/* Content */}
-            <div className="relative h-full container flex items-center px-4 sm:px-6">
-              <div className="max-w-2xl space-y-4 sm:space-y-6 text-white animate-fade-in">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-white/20 backdrop-blur-md border border-white/30">
-                  <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
+            <div className="relative h-full flex items-center px-4 sm:px-6 md:px-8 lg:container lg:mx-auto">
+              <div className="w-full max-w-2xl space-y-3 sm:space-y-4 md:space-y-6 text-white animate-fade-in">
+                <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-full bg-white/20 backdrop-blur-md border border-white/30">
+                  <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                   </svg>
-                  <span className="text-xs sm:text-sm font-medium">{slide.badge}</span>
+                  <span className="text-[10px] sm:text-xs md:text-sm font-medium">{slide.badge}</span>
                 </div>
-                <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold leading-tight">
+                <h1 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-7xl font-bold leading-tight">
                   {slide.title}
                 </h1>
-                <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white/90">
+                <p className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-white/90 max-w-xl">
                   {slide.subtitle}
                 </p>
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-2 sm:pt-4">
-                  <Button size="lg" asChild className="text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 rounded-xl shadow-2xl hover:scale-105 transition-transform">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 md:gap-4 pt-1 sm:pt-2 md:pt-4">
+                  <Button size="lg" asChild className="text-sm sm:text-base md:text-lg px-5 py-4 sm:px-6 sm:py-5 md:px-8 md:py-6 rounded-lg sm:rounded-xl shadow-2xl hover:scale-105 transition-transform">
                     <Link to="/shop">{slide.cta}</Link>
                   </Button>
-                  <Button size="lg" variant="outline" asChild className="text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 rounded-xl bg-white/10 backdrop-blur-md border-white/30 text-white hover:bg-white/20 hover:scale-105 transition-transform">
+                  <Button size="lg" variant="outline" asChild className="text-sm sm:text-base md:text-lg px-5 py-4 sm:px-6 sm:py-5 md:px-8 md:py-6 rounded-lg sm:rounded-xl bg-white/10 backdrop-blur-md border-white/30 text-white hover:bg-white/20 hover:scale-105 transition-transform">
                     <a href="#bestsellers">Learn More</a>
                   </Button>
                 </div>
@@ -167,18 +167,18 @@ export default function Index() {
 
       {/* Features Bar */}
       <section className="border-y bg-muted/30">
-        <div className="container py-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="container py-6 sm:py-8 px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             {[
               { icon: "🚚", title: "Free Shipping", desc: "On orders over $50" },
               { icon: "✨", title: "Premium Quality", desc: "Luxury ingredients" },
               { icon: "🎁", title: "Gift Wrapping", desc: "Complimentary service" },
               { icon: "💯", title: "Satisfaction", desc: "30-day guarantee" }
             ].map((feature, i) => (
-              <div key={i} className="text-center space-y-2 animate-fade-in" style={{animationDelay: `${i * 100}ms`}}>
-                <div className="text-4xl">{feature.icon}</div>
-                <h3 className="font-semibold">{feature.title}</h3>
-                <p className="text-sm text-muted-foreground">{feature.desc}</p>
+              <div key={i} className="text-center space-y-1 sm:space-y-2 animate-fade-in" style={{animationDelay: `${i * 100}ms`}}>
+                <div className="text-2xl sm:text-3xl md:text-4xl">{feature.icon}</div>
+                <h3 className="font-semibold text-xs sm:text-sm md:text-base">{feature.title}</h3>
+                <p className="text-[10px] sm:text-xs md:text-sm text-muted-foreground">{feature.desc}</p>
               </div>
             ))}
           </div>
