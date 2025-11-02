@@ -26,5 +26,7 @@ RUN python manage.py collectstatic --noinput
 # Expose port
 EXPOSE 8000
 
-# Run gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "config.wsgi:application"]
+# Run migrations, seed data, and start gunicorn
+CMD python manage.py migrate --noinput && \
+    python manage.py seed_data && \
+    gunicorn --bind 0.0.0.0:$PORT --workers 3 config.wsgi:application
