@@ -120,7 +120,7 @@ export default function Index() {
                 </p>
                 
                 {/* Buttons */}
-                <div className="flex flex-col xs:flex-row items-stretch xs:items-center justify-center sm:justify-start gap-2 xs:gap-2.5 sm:gap-3 md:gap-4 pt-1 xs:pt-2 sm:pt-3 md:pt-4 max-w-full">
+                <div className="flex flex-col xs:flex-row items-stretch xs:items-center justify-center sm:justify-start gap-2 xs:gap-2.5 sm:gap-3 md:gap-4 pt-4 xs:pt-2 sm:pt-3 md:pt-4 max-w-full">
                   <Button 
                     size="lg" 
                     asChild 
@@ -132,7 +132,7 @@ export default function Index() {
                     size="lg" 
                     variant="outline" 
                     asChild 
-                    className="text-xs xs:text-sm sm:text-base md:text-lg px-4 py-3 xs:px-5 xs:py-4 sm:px-6 sm:py-5 md:px-8 md:py-6 rounded-lg sm:rounded-xl bg-white/10 backdrop-blur-md border-white/30 text-white hover:bg-white/20 hover:scale-105 transition-transform w-full xs:w-auto max-w-full"
+                    className="hidden xs:flex text-xs xs:text-sm sm:text-base md:text-lg px-4 py-3 xs:px-5 xs:py-4 sm:px-6 sm:py-5 md:px-8 md:py-6 rounded-lg sm:rounded-xl bg-white/10 backdrop-blur-md border-white/30 text-white hover:bg-white/20 hover:scale-105 transition-transform w-full xs:w-auto max-w-full"
                   >
                     <a href="#bestsellers">Learn More</a>
                   </Button>
