@@ -192,15 +192,26 @@ REST_FRAMEWORK = {
 }
 
 # CORS settings
+# Get CORS origins from environment variable
+cors_origins_str = config(
+    'CORS_ALLOWED_ORIGINS',
+    default='http://localhost:5173,http://localhost:3000,http://localhost:8080,https://front-pi-nine.vercel.app'
+)
+
 CORS_ALLOWED_ORIGINS = [
     origin.strip() 
-    for origin in config(
-        'CORS_ALLOWED_ORIGINS',
-        default='http://localhost:5173,http://localhost:3000,http://localhost:8080'
-    ).split(',')
+    for origin in cors_origins_str.split(',')
+    if origin.strip()  # Filter out empty strings
 ]
 
-CORS_ALLOW_ALL_ORIGINS = False
+# Allow all Vercel preview deployments
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://.*\.vercel\.app$",
+]
+
+# Allow all origins in production if CORS_ALLOWED_ORIGINS is not properly set
+# This is a temporary fix - set CORS_ALLOWED_ORIGINS in Railway env vars
+CORS_ALLOW_ALL_ORIGINS = config('CORS_ALLOW_ALL_ORIGINS', default=False, cast=bool)
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
