@@ -76,7 +76,7 @@ export default function Index() {
   return (
     <>
       {/* Hero Slider */}
-      <section className="relative h-[450px] sm:h-[550px] md:h-[650px] lg:h-[700px] overflow-hidden">
+      <section className="relative h-[400px] xs:h-[450px] sm:h-[500px] md:h-[600px] lg:h-[700px] overflow-hidden">
         {/* Slides */}
         {heroSlides.map((slide, index) => (
           <div
@@ -93,30 +93,47 @@ export default function Index() {
                 src={slide.image}
                 alt={slide.title}
                 className="w-full h-full object-cover object-center"
+                loading="lazy"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80 sm:bg-gradient-to-r sm:from-black/80 sm:via-black/60 sm:to-black/40 md:from-black/70 md:via-black/50 md:to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/65 to-black/85 sm:bg-gradient-to-r sm:from-black/80 sm:via-black/60 sm:to-black/40 md:from-black/70 md:via-black/50 md:to-transparent" />
             </div>
 
             {/* Content */}
-            <div className="relative h-full flex items-center px-4 sm:px-6 md:px-8 lg:container lg:mx-auto">
-              <div className="w-full max-w-2xl space-y-3 sm:space-y-4 md:space-y-6 text-white animate-fade-in">
-                <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-full bg-white/20 backdrop-blur-md border border-white/30">
-                  <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4" fill="currentColor" viewBox="0 0 20 20">
+            <div className="relative h-full flex items-center justify-center sm:justify-start px-3 xs:px-4 sm:px-6 md:px-8 lg:container lg:mx-auto">
+              <div className="w-full max-w-2xl space-y-2 xs:space-y-3 sm:space-y-4 md:space-y-6 text-white text-center sm:text-left animate-fade-in">
+                {/* Badge */}
+                <div className="inline-flex items-center gap-1 xs:gap-1.5 sm:gap-2 px-2 xs:px-2.5 py-0.5 xs:py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-[9px] xs:text-[10px] sm:text-xs md:text-sm font-medium">
+                  <svg className="w-2.5 h-2.5 xs:w-3 xs:h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                   </svg>
-                  <span className="text-[10px] sm:text-xs md:text-sm font-medium">{slide.badge}</span>
+                  <span>{slide.badge}</span>
                 </div>
-                <h1 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-7xl font-bold leading-tight">
+                
+                {/* Title */}
+                <h1 className="font-display text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-bold leading-tight tracking-tight">
                   {slide.title}
                 </h1>
-                <p className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-white/90 max-w-xl">
+                
+                {/* Subtitle */}
+                <p className="text-xs xs:text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-white/90 max-w-xl mx-auto sm:mx-0">
                   {slide.subtitle}
                 </p>
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 md:gap-4 pt-1 sm:pt-2 md:pt-4">
-                  <Button size="lg" asChild className="text-sm sm:text-base md:text-lg px-5 py-4 sm:px-6 sm:py-5 md:px-8 md:py-6 rounded-lg sm:rounded-xl shadow-2xl hover:scale-105 transition-transform">
+                
+                {/* Buttons */}
+                <div className="flex flex-col xs:flex-row items-stretch xs:items-center justify-center sm:justify-start gap-2 xs:gap-2.5 sm:gap-3 md:gap-4 pt-1 xs:pt-2 sm:pt-3 md:pt-4">
+                  <Button 
+                    size="lg" 
+                    asChild 
+                    className="text-xs xs:text-sm sm:text-base md:text-lg px-4 py-3 xs:px-5 xs:py-4 sm:px-6 sm:py-5 md:px-8 md:py-6 rounded-lg sm:rounded-xl shadow-2xl hover:scale-105 transition-transform w-full xs:w-auto"
+                  >
                     <Link to="/shop">{slide.cta}</Link>
                   </Button>
-                  <Button size="lg" variant="outline" asChild className="text-sm sm:text-base md:text-lg px-5 py-4 sm:px-6 sm:py-5 md:px-8 md:py-6 rounded-lg sm:rounded-xl bg-white/10 backdrop-blur-md border-white/30 text-white hover:bg-white/20 hover:scale-105 transition-transform">
+                  <Button 
+                    size="lg" 
+                    variant="outline" 
+                    asChild 
+                    className="text-xs xs:text-sm sm:text-base md:text-lg px-4 py-3 xs:px-5 xs:py-4 sm:px-6 sm:py-5 md:px-8 md:py-6 rounded-lg sm:rounded-xl bg-white/10 backdrop-blur-md border-white/30 text-white hover:bg-white/20 hover:scale-105 transition-transform w-full xs:w-auto"
+                  >
                     <a href="#bestsellers">Learn More</a>
                   </Button>
                 </div>
@@ -128,25 +145,25 @@ export default function Index() {
         {/* Navigation Arrows */}
         <button
           onClick={prevSlide}
-          className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all hover:scale-110 z-10"
+          className="absolute left-1 xs:left-2 sm:left-4 top-1/2 -translate-y-1/2 p-1.5 xs:p-2 sm:p-3 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all hover:scale-110 z-10 active:scale-95"
           aria-label="Previous slide"
         >
-          <svg className="w-4 h-4 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          <svg className="w-3 h-3 xs:w-4 xs:h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
         </button>
         <button
           onClick={nextSlide}
-          className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all hover:scale-110 z-10"
+          className="absolute right-1 xs:right-2 sm:right-4 top-1/2 -translate-y-1/2 p-1.5 xs:p-2 sm:p-3 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white hover:bg-white/30 transition-all hover:scale-110 z-10 active:scale-95"
           aria-label="Next slide"
         >
-          <svg className="w-4 h-4 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          <svg className="w-3 h-3 xs:w-4 xs:h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
           </svg>
         </button>
 
         {/* Dots Indicator */}
-        <div className="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 sm:gap-3 z-10">
+        <div className="absolute bottom-3 xs:bottom-4 sm:bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-1.5 xs:gap-2 sm:gap-3 z-10">
           {heroSlides.map((_, index) => (
             <button
               key={index}
@@ -156,8 +173,8 @@ export default function Index() {
               }}
               className={`transition-all ${
                 index === currentSlide
-                  ? 'w-8 sm:w-12 h-2 sm:h-3 bg-white rounded-full'
-                  : 'w-2 sm:w-3 h-2 sm:h-3 bg-white/50 rounded-full hover:bg-white/70'
+                  ? 'w-6 xs:w-8 sm:w-10 md:w-12 h-1.5 xs:h-2 sm:h-2.5 md:h-3 bg-white rounded-full'
+                  : 'w-1.5 xs:w-2 sm:w-2.5 md:w-3 h-1.5 xs:h-2 sm:h-2.5 md:h-3 bg-white/50 rounded-full hover:bg-white/70'
               }`}
               aria-label={`Go to slide ${index + 1}`}
             />
