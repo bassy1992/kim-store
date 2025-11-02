@@ -99,8 +99,8 @@ export default function Index() {
             </div>
 
             {/* Content */}
-            <div className="relative h-full flex items-center justify-center sm:justify-start px-3 xs:px-4 sm:px-6 md:px-8 lg:container lg:mx-auto">
-              <div className="w-full max-w-2xl space-y-2 xs:space-y-3 sm:space-y-4 md:space-y-6 text-white text-center sm:text-left animate-fade-in">
+            <div className="relative h-full w-full flex items-center justify-center sm:justify-start">
+              <div className="w-full max-w-[calc(100%-1.5rem)] xs:max-w-[calc(100%-2rem)] sm:max-w-2xl mx-auto sm:ml-6 md:ml-8 lg:ml-12 space-y-2 xs:space-y-3 sm:space-y-4 md:space-y-6 text-white text-center sm:text-left animate-fade-in">
                 {/* Badge */}
                 <div className="inline-flex items-center gap-1 xs:gap-1.5 sm:gap-2 px-2 xs:px-2.5 py-0.5 xs:py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-[9px] xs:text-[10px] sm:text-xs md:text-sm font-medium">
                   <svg className="w-2.5 h-2.5 xs:w-3 xs:h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -110,21 +110,21 @@ export default function Index() {
                 </div>
                 
                 {/* Title */}
-                <h1 className="font-display text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-bold leading-tight tracking-tight">
+                <h1 className="font-display text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-bold leading-tight tracking-tight break-words">
                   {slide.title}
                 </h1>
                 
                 {/* Subtitle */}
-                <p className="text-xs xs:text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-white/90 max-w-xl mx-auto sm:mx-0">
+                <p className="text-xs xs:text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-white/90 max-w-xl mx-auto sm:mx-0 break-words">
                   {slide.subtitle}
                 </p>
                 
                 {/* Buttons */}
-                <div className="flex flex-col xs:flex-row items-stretch xs:items-center justify-center sm:justify-start gap-2 xs:gap-2.5 sm:gap-3 md:gap-4 pt-1 xs:pt-2 sm:pt-3 md:pt-4">
+                <div className="flex flex-col xs:flex-row items-stretch xs:items-center justify-center sm:justify-start gap-2 xs:gap-2.5 sm:gap-3 md:gap-4 pt-1 xs:pt-2 sm:pt-3 md:pt-4 max-w-full">
                   <Button 
                     size="lg" 
                     asChild 
-                    className="text-xs xs:text-sm sm:text-base md:text-lg px-4 py-3 xs:px-5 xs:py-4 sm:px-6 sm:py-5 md:px-8 md:py-6 rounded-lg sm:rounded-xl shadow-2xl hover:scale-105 transition-transform w-full xs:w-auto"
+                    className="text-xs xs:text-sm sm:text-base md:text-lg px-4 py-3 xs:px-5 xs:py-4 sm:px-6 sm:py-5 md:px-8 md:py-6 rounded-lg sm:rounded-xl shadow-2xl hover:scale-105 transition-transform w-full xs:w-auto max-w-full"
                   >
                     <Link to="/shop">{slide.cta}</Link>
                   </Button>
@@ -132,7 +132,7 @@ export default function Index() {
                     size="lg" 
                     variant="outline" 
                     asChild 
-                    className="text-xs xs:text-sm sm:text-base md:text-lg px-4 py-3 xs:px-5 xs:py-4 sm:px-6 sm:py-5 md:px-8 md:py-6 rounded-lg sm:rounded-xl bg-white/10 backdrop-blur-md border-white/30 text-white hover:bg-white/20 hover:scale-105 transition-transform w-full xs:w-auto"
+                    className="text-xs xs:text-sm sm:text-base md:text-lg px-4 py-3 xs:px-5 xs:py-4 sm:px-6 sm:py-5 md:px-8 md:py-6 rounded-lg sm:rounded-xl bg-white/10 backdrop-blur-md border-white/30 text-white hover:bg-white/20 hover:scale-105 transition-transform w-full xs:w-auto max-w-full"
                   >
                     <a href="#bestsellers">Learn More</a>
                   </Button>
