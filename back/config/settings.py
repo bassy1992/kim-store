@@ -51,7 +51,12 @@ CSRF_COOKIE_NAME = 'csrftoken'
 
 # Additional CSRF settings for Railway
 CSRF_COOKIE_DOMAIN = None
+CSRF_COOKIE_PATH = '/'
 CSRF_FAILURE_VIEW = 'django.views.csrf.csrf_failure'
+
+# Ensure CSRF cookie is set on all requests
+CSRF_COOKIE_AGE = 31449600  # 1 year
+SESSION_COOKIE_AGE = 1209600  # 2 weeks
 
 # Application definition
 
