@@ -20,6 +20,10 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import RedirectView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
+from django.views.decorators.csrf import ensure_csrf_cookie
+
+# Import admin customization
+from . import admin as custom_admin
 
 urlpatterns = [
     path('', RedirectView.as_view(url='/api/docs/', permanent=False)),
