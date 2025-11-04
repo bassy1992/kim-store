@@ -39,19 +39,19 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 # Session and Cookie Settings for Railway
-if not DEBUG:
-    SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', default=True, cast=bool)
-    CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', default=True, cast=bool)
-else:
-    SESSION_COOKIE_SECURE = False
-    CSRF_COOKIE_SECURE = False
-
+# Use secure cookies only in production with HTTPS
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = False
 SESSION_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_USE_SESSIONS = False
 CSRF_COOKIE_NAME = 'csrftoken'
+
+# Additional CSRF settings for Railway
+CSRF_COOKIE_DOMAIN = None
+CSRF_FAILURE_VIEW = 'django.views.csrf.csrf_failure'
 
 # Application definition
 
