@@ -1,8 +1,0 @@
-back/
-node_modules/
-.git/
-.vscode/
-.kiro/
-*.md
-*.bat
-test-connection.html
