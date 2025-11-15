@@ -33,7 +33,7 @@ CSRF_TRUSTED_ORIGINS = [
     origin.strip()
     for origin in config(
         'CSRF_TRUSTED_ORIGINS',
-        default='https://*.railway.app,https://*.up.railway.app,https://kim-store-production.up.railway.app'
+        default='https://*.railway.app,https://*.up.railway.app,https://kim-store-production.up.railway.app,https://front-pi-nine.vercel.app,https://*.vercel.app'
     ).split(',')
     if origin.strip()
 ]
@@ -221,8 +221,11 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'config.exceptions.custom_exception_handler',
 }
 
-# CORS settings
-# Get CORS origins from environment variable
+# CORS settings - Fixed for Railway deployment
+# Temporary: Allow all origins for debugging CORS issues
+CORS_ALLOW_ALL_ORIGINS = config('CORS_ALLOW_ALL_ORIGINS', default=True, cast=bool)
+
+# Specific allowed origins (used when CORS_ALLOW_ALL_ORIGINS is False)
 cors_origins_str = config(
     'CORS_ALLOWED_ORIGINS',
     default='http://localhost:5173,http://localhost:3000,http://localhost:8080,http://localhost:8081,http://192.168.1.104:8080,http://192.168.1.104:8081,https://front-pi-nine.vercel.app'
@@ -241,11 +244,9 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^http://10\.\d+\.\d+\.\d+:808[01]$",   # Allow 10.x.x.x network IPs on port 8080 or 8081
 ]
 
-# Allow all origins in production if CORS_ALLOWED_ORIGINS is not properly set
-# This is a temporary fix - set CORS_ALLOWED_ORIGINS in Railway env vars
-CORS_ALLOW_ALL_ORIGINS = config('CORS_ALLOW_ALL_ORIGINS', default=False, cast=bool)
-
 CORS_ALLOW_CREDENTIALS = True
+
+# Comprehensive CORS headers
 CORS_ALLOW_HEADERS = [
     'accept',
     'accept-encoding',
@@ -256,7 +257,11 @@ CORS_ALLOW_HEADERS = [
     'user-agent',
     'x-csrftoken',
     'x-requested-with',
+    'cache-control',
+    'pragma',
+    'expires',
 ]
+
 CORS_ALLOW_METHODS = [
     'DELETE',
     'GET',
@@ -264,6 +269,13 @@ CORS_ALLOW_METHODS = [
     'PATCH',
     'POST',
     'PUT',
+]
+
+# Additional CORS settings for Railway
+CORS_PREFLIGHT_MAX_AGE = 86400  # 24 hours
+CORS_EXPOSE_HEADERS = [
+    'content-type',
+    'x-csrftoken',
 ]
 
 # drf-spectacular settings

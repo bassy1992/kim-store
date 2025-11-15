@@ -24,10 +24,17 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 
 # Import admin customization
 from . import admin as custom_admin
+from .test_views import api_status, api_stats, health_check, cors_test
 
 urlpatterns = [
     path('', RedirectView.as_view(url='/api/docs/', permanent=False)),
     path('admin/', admin.site.urls),
+    
+    # Test endpoints for frontend connection
+    path('health/', health_check, name='health_check'),
+    path('api/status/', api_status, name='api_status'),
+    path('api/stats/', api_stats, name='api_stats'),
+    path('api/cors-test/', cors_test, name='cors_test'),
     
     # API documentation
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
