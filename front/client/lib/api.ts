@@ -2,7 +2,12 @@
  * API Client for Django Backend
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+// Temporary CORS proxy solution while Railway is down
+const USE_CORS_PROXY = true;
+const RAILWAY_API_URL = import.meta.env.VITE_API_URL || 'https://kim-store-production.up.railway.app/api';
+const CORS_PROXY_URL = '/api'; // Vercel serverless function proxy
+
+const API_BASE_URL = USE_CORS_PROXY ? CORS_PROXY_URL : RAILWAY_API_URL;
 
 // Types
 export interface Product {
