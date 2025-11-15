@@ -14,8 +14,8 @@ ALLOWED_HOSTS=*.railway.app,*.up.railway.app
 ### CORS Configuration
 ```
 CORS_ALLOW_ALL_ORIGINS=True
-CORS_ALLOWED_ORIGINS=https://front-pi-nine.vercel.app,https://localhost:3000,https://localhost:5173
-CSRF_TRUSTED_ORIGINS=https://*.railway.app,https://*.up.railway.app,https://front-pi-nine.vercel.app,https://*.vercel.app,https://kim-store-production.up.railway.app
+CORS_ALLOWED_ORIGINS=https://front-pi-nine.vercel.app,https://front-gbhu180nn-bassys-projects-fca17413.vercel.app,https://localhost:3000,https://localhost:5173
+CSRF_TRUSTED_ORIGINS=https://*.railway.app,https://*.up.railway.app,https://front-pi-nine.vercel.app,https://front-gbhu180nn-bassys-projects-fca17413.vercel.app,https://*.vercel.app,https://kim-store-production.up.railway.app
 ```
 
 ### Superuser Creation

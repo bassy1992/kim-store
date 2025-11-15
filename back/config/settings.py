@@ -33,7 +33,7 @@ CSRF_TRUSTED_ORIGINS = [
     origin.strip()
     for origin in config(
         'CSRF_TRUSTED_ORIGINS',
-        default='https://*.railway.app,https://*.up.railway.app,https://kim-store-production.up.railway.app,https://front-pi-nine.vercel.app,https://*.vercel.app'
+        default='https://*.railway.app,https://*.up.railway.app,https://kim-store-production.up.railway.app,https://front-pi-nine.vercel.app,https://front-gbhu180nn-bassys-projects-fca17413.vercel.app,https://*.vercel.app'
     ).split(',')
     if origin.strip()
 ]
@@ -236,7 +236,7 @@ CORS_ALLOW_ALL_ORIGINS = config('CORS_ALLOW_ALL_ORIGINS', default=True, cast=boo
 # Specific allowed origins (used when CORS_ALLOW_ALL_ORIGINS is False)
 cors_origins_str = config(
     'CORS_ALLOWED_ORIGINS',
-    default='http://localhost:5173,http://localhost:3000,http://localhost:8080,http://localhost:8081,http://192.168.1.104:8080,http://192.168.1.104:8081,https://front-pi-nine.vercel.app'
+    default='http://localhost:5173,http://localhost:3000,http://localhost:8080,http://localhost:8081,http://192.168.1.104:8080,http://192.168.1.104:8081,https://front-pi-nine.vercel.app,https://front-gbhu180nn-bassys-projects-fca17413.vercel.app'
 )
 
 CORS_ALLOWED_ORIGINS = [
