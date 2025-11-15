@@ -1,37 +1,52 @@
 // Catch-all CORS proxy for Railway API
 export default async function handler(req, res) {
-  // Add CORS headers
+  // Add comprehensive CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD');
   res.setHeader('Access-Control-Allow-Headers', '*');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Max-Age', '86400');
   
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
+    console.log('✅ CORS Preflight handled');
     res.status(200).end();
     return;
   }
   
   try {
     const { path } = req.query;
-    const railwayUrl = 'https://kim-store-production.up.railway.app';
+    const railwayUrl = process.env.RAILWAY_URL || 'https://web-production-0b12.up.railway.app';
     
     // Construct the target URL
-    const targetPath = Array.isArray(path) ? path.join('/') : '';
-    const queryString = req.url.split('?')[1] || '';
-    const targetUrl = `${railwayUrl}/${targetPath}${queryString ? `?${queryString}` : ''}`;
+    const targetPath = Array.isArray(path) ? path.join('/') : (path || '');
     
-    console.log('Proxying request:', {
+    // Get query string from original URL, excluding the path parameter
+    const url = new URL(req.url, `https://${req.headers.host}`);
+    const queryParams = new URLSearchParams(url.search);
+    queryParams.delete('path'); // Remove the path parameter
+    const queryString = queryParams.toString();
+    
+    const targetUrl = `${railwayUrl}/api/${targetPath}${queryString ? `?${queryString}` : ''}`;
+    
+    console.log('🔄 Proxying request:', {
       method: req.method,
+      originalUrl: req.url,
       targetUrl,
-      headers: req.headers
+      path: targetPath,
+      query: queryString
     });
     
     // Prepare headers for Railway request
     const headers = {
-      'Content-Type': 'application/json',
-      'User-Agent': 'Vercel-CORS-Proxy/1.0'
+      'User-Agent': 'Vercel-CORS-Proxy/2.0',
+      'Accept': 'application/json'
     };
+    
+    // Only set Content-Type for requests with body
+    if (req.method !== 'GET' && req.method !== 'HEAD' && req.body) {
+      headers['Content-Type'] = 'application/json';
+    }
     
     // Add authorization if present
     if (req.headers.authorization) {
@@ -51,26 +66,42 @@ export default async function handler(req, res) {
     
     const response = await fetch(targetUrl, fetchOptions);
     
+    console.log('📡 Railway response:', {
+      status: response.status,
+      statusText: response.statusText,
+      contentType: response.headers.get('content-type')
+    });
+    
     // Get response data
     let data;
     const contentType = response.headers.get('content-type');
     
     if (contentType && contentType.includes('application/json')) {
-      data = await response.json();
+      try {
+        data = await response.json();
+      } catch (e) {
+        console.error('Failed to parse JSON:', e);
+        data = await response.text();
+      }
     } else {
       data = await response.text();
     }
     
     // Return the response with CORS headers
-    res.status(response.status).json(data);
+    if (typeof data === 'string' && !contentType?.includes('application/json')) {
+      res.status(response.status).send(data);
+    } else {
+      res.status(response.status).json(data);
+    }
     
   } catch (error) {
-    console.error('Proxy error:', error);
+    console.error('❌ Proxy error:', error);
     res.status(500).json({
       error: 'CORS Proxy failed',
       message: error.message,
       details: 'Railway backend may be unreachable',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      railwayUrl: 'https://kim-store-production.up.railway.app'
     });
   }
 }

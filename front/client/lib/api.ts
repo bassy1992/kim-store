@@ -2,12 +2,21 @@
  * API Client for Django Backend
  */
 
-// Temporary CORS proxy solution while Railway is down
+// CORS proxy solution - ALWAYS use proxy to avoid Railway CORS issues
 const USE_CORS_PROXY = true;
 const RAILWAY_API_URL = import.meta.env.VITE_API_URL || 'https://kim-store-production.up.railway.app/api';
 const CORS_PROXY_URL = '/api'; // Vercel serverless function proxy
 
 const API_BASE_URL = USE_CORS_PROXY ? CORS_PROXY_URL : RAILWAY_API_URL;
+
+// Debug logging
+console.log('🔧 API Configuration:', {
+  USE_CORS_PROXY,
+  RAILWAY_API_URL,
+  CORS_PROXY_URL,
+  API_BASE_URL,
+  environment: import.meta.env.MODE
+});
 
 // Types
 export interface Product {
@@ -144,12 +153,25 @@ async function apiFetch<T>(
     headers['Authorization'] = `Token ${token}`;
   }
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+  const fullUrl = `${API_BASE_URL}${endpoint}`;
+  console.log('🌐 API Request:', {
+    endpoint,
+    fullUrl,
+    method: options.method || 'GET',
+    useProxy: USE_CORS_PROXY
+  });
+
+  const response = await fetch(fullUrl, {
     ...options,
     headers,
   });
 
   if (!response.ok) {
+    console.error('❌ API Error:', {
+      url: fullUrl,
+      status: response.status,
+      statusText: response.statusText
+    });
     const error = await response.json().catch(() => ({ message: 'An error occurred' }));
     throw new Error(error.message || `HTTP ${response.status}`);
   }

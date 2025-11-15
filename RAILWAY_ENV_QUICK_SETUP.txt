@@ -1,0 +1,20 @@
+🚀 RAILWAY ENVIRONMENT VARIABLES - COPY & PASTE
+
+Add these in Railway → Your Service → Variables:
+
+SECRET_KEY=django-insecure-change-this-to-random-string-12345
+DEBUG=False
+ALLOWED_HOSTS=.railway.app,.up.railway.app
+USE_POSTGRES=True
+CORS_ALLOWED_ORIGINS=https://kimmy-beta.vercel.app
+DJANGO_SETTINGS_MODULE=config.settings
+
+📝 IMPORTANT:
+1. Generate a new SECRET_KEY (run this command):
+   python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+
+2. Replace the SECRET_KEY above with the generated one
+
+3. Update CORS_ALLOWED_ORIGINS with your actual Vercel URL
+
+4. After deployment, get your Railway URL and update Vercel's VITE_API_URL

@@ -1,0 +1,26 @@
+🚀 RAILWAY ENVIRONMENT VARIABLES - COPY & PASTE THESE EXACTLY
+
+Go to Railway Dashboard → Your Service → Variables → Add these:
+
+SECRET_KEY=bqle6jsw525f5y&b2zr_43q2-n2!fbhiy$cbr4f0)1^6@r*-@m
+DEBUG=False
+ALLOWED_HOSTS=.railway.app,.up.railway.app,web-production-0b12.up.railway.app
+USE_POSTGRES=True
+CORS_ALLOWED_ORIGINS=https://kimmy-beta.vercel.app
+DJANGO_SETTINGS_MODULE=config.settings
+
+📋 STEPS:
+1. Copy each line above
+2. In Railway, click "New Variable"
+3. Paste the variable name (before =)
+4. Paste the value (after =)
+5. Repeat for all 6 variables
+6. Click "Deploy" to redeploy with new variables
+
+⚠️ IMPORTANT: 
+- Copy exactly as shown (including dots and commas)
+- Don't add extra spaces
+- Make sure PostgreSQL service is running
+
+🧪 TEST AFTER DEPLOYMENT:
+Run: node test-backend-status.js

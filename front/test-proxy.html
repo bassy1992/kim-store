@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Vercel Proxy</title>
+</head>
+<body>
+    <h1>Testing Vercel API Proxy</h1>
+    <div id="results"></div>
+    
+    <script>
+        async function testProxy() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Testing proxy...</p>';
+            
+            try {
+                console.log('Testing /api/products/ endpoint...');
+                const response = await fetch('/api/products/');
+                console.log('Response status:', response.status);
+                console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+                
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                results.innerHTML = `
+                    <h2>✅ Proxy Test Results</h2>
+                    <p><strong>Status:</strong> ${response.status}</p>
+                    <p><strong>Data:</strong> ${JSON.stringify(data, null, 2)}</p>
+                `;
+            } catch (error) {
+                console.error('Proxy test failed:', error);
+                results.innerHTML = `
+                    <h2>❌ Proxy Test Failed</h2>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                `;
+            }
+        }
+        
+        // Run test when page loads
+        testProxy();
+    </script>
+</body>
+</html>

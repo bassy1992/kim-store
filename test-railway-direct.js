@@ -1,47 +1,45 @@
-// Direct test of Railway backend
-// Run this in any browser console
-
+// Test Railway backend directly
 async function testRailwayDirect() {
     const railwayUrl = 'https://kim-store-production.up.railway.app';
     
-    console.log('🔍 Testing Railway backend directly...');
-    
-    const tests = [
-        { name: 'Root', url: railwayUrl },
-        { name: 'Health', url: `${railwayUrl}/health/` },
-        { name: 'Emergency', url: `${railwayUrl}/emergency/` },
-        { name: 'API Products', url: `${railwayUrl}/api/products/` }
-    ];
-    
-    for (const test of tests) {
-        try {
-            console.log(`Testing ${test.name}...`);
-            
-            const response = await fetch(test.url, {
-                method: 'GET',
-                mode: 'no-cors' // Bypass CORS for testing
-            });
-            
-            console.log(`✅ ${test.name}: Status ${response.status} (${response.type})`);
-            
-        } catch (error) {
-            console.log(`❌ ${test.name}: ${error.message}`);
-        }
-    }
-    
-    // Test with curl-like approach
-    console.log('\n🌐 Testing with fetch (will show CORS error but confirms server is up):');
+    console.log('🧪 Testing Railway backend directly...');
     
     try {
-        const response = await fetch(`${railwayUrl}/`);
-        console.log('✅ Railway is responding!');
-    } catch (error) {
-        if (error.message.includes('CORS')) {
-            console.log('✅ Railway is UP (CORS error means server responded)');
+        // Test API root
+        console.log('Testing API root...');
+        const apiResponse = await fetch(`${railwayUrl}/api/`);
+        console.log('API Root Status:', apiResponse.status);
+        
+        // Test products endpoint
+        console.log('Testing products endpoint...');
+        const productsResponse = await fetch(`${railwayUrl}/api/products/`);
+        console.log('Products Status:', productsResponse.status);
+        
+        if (productsResponse.ok) {
+            const productsData = await productsResponse.json();
+            console.log('Products Data:', productsData);
         } else {
-            console.log('❌ Railway is DOWN:', error.message);
+            const errorText = await productsResponse.text();
+            console.log('Products Error:', errorText);
         }
+        
+        // Test cart endpoint
+        console.log('Testing cart endpoint...');
+        const cartResponse = await fetch(`${railwayUrl}/api/cart/`);
+        console.log('Cart Status:', cartResponse.status);
+        
+        if (cartResponse.ok) {
+            const cartData = await cartResponse.json();
+            console.log('Cart Data:', cartData);
+        } else {
+            const errorText = await cartResponse.text();
+            console.log('Cart Error:', errorText);
+        }
+        
+    } catch (error) {
+        console.error('❌ Railway test failed:', error);
     }
 }
 
+// Run the test
 testRailwayDirect();

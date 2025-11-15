@@ -4,8 +4,8 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "cd back && python manage.py migrate && python manage.py create_superuser_auto && python manage.py populate_database && python manage.py collectstatic --noinput && gunicorn config.wsgi --bind 0.0.0.0:$PORT",
+    "startCommand": "cd back && python manage.py migrate && python manage.py collectstatic --noinput && gunicorn config.wsgi --bind 0.0.0.0:$PORT",
     "restartPolicyType": "ON_FAILURE",
-    "restartPolicyMaxRetries": 10
+    "restartPolicyMaxRetries": 3
   }
 }

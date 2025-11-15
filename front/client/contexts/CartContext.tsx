@@ -1,6 +1,17 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+// Use the same CORS proxy configuration as the main API
+const USE_CORS_PROXY = true;
+const RAILWAY_API_URL = import.meta.env.VITE_API_URL || 'https://kim-store-production.up.railway.app/api';
+const CORS_PROXY_URL = '/api'; // Vercel serverless function proxy
+
+const API_BASE_URL = USE_CORS_PROXY ? CORS_PROXY_URL : RAILWAY_API_URL;
+
+console.log('🛒 Cart API Configuration:', {
+  USE_CORS_PROXY,
+  API_BASE_URL,
+  environment: import.meta.env.MODE
+});
 
 export type CartItem = {
   id: string;
