@@ -80,6 +80,7 @@ INSTALLED_APPS = [
     'apps.customers',
     'apps.reviews',
     'apps.blog',
+    'apps.content',
 ]
 
 MIDDLEWARE = [
@@ -224,7 +225,7 @@ REST_FRAMEWORK = {
 # Get CORS origins from environment variable
 cors_origins_str = config(
     'CORS_ALLOWED_ORIGINS',
-    default='http://localhost:5173,http://localhost:3000,http://localhost:8080,https://front-pi-nine.vercel.app'
+    default='http://localhost:5173,http://localhost:3000,http://localhost:8080,http://localhost:8081,http://192.168.1.104:8080,http://192.168.1.104:8081,https://front-pi-nine.vercel.app'
 )
 
 CORS_ALLOWED_ORIGINS = [
@@ -233,9 +234,11 @@ CORS_ALLOWED_ORIGINS = [
     if origin.strip()  # Filter out empty strings
 ]
 
-# Allow all Vercel preview deployments
+# Allow all Vercel preview deployments and local network IPs
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https://.*\.vercel\.app$",
+    r"^http://192\.168\.\d+\.\d+:808[01]$",  # Allow local network IPs on port 8080 or 8081
+    r"^http://10\.\d+\.\d+\.\d+:808[01]$",   # Allow 10.x.x.x network IPs on port 8080 or 8081
 ]
 
 # Allow all origins in production if CORS_ALLOWED_ORIGINS is not properly set

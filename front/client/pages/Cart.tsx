@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 export default function Cart() {
-  const { items, remove, total, clear } = useCart();
+  const { items, remove, total, clear, updateQuantity } = useCart();
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-background to-muted/20">
@@ -86,7 +86,7 @@ export default function Cart() {
                             </h3>
                           </Link>
                           <p className="text-sm text-muted-foreground mt-1">
-                            ${item.price.toFixed(2)} each
+                            ₵{item.price.toFixed(2)} each
                           </p>
                         </div>
 
@@ -107,13 +107,20 @@ export default function Cart() {
                         <div className="flex items-center gap-3">
                           <span className="text-sm text-muted-foreground">Quantity:</span>
                           <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted">
-                            <button className="text-muted-foreground hover:text-foreground transition-colors">
+                            <button 
+                              onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                              disabled={item.quantity <= 1}
+                              className="text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
                               </svg>
                             </button>
                             <span className="font-semibold min-w-[2ch] text-center">{item.quantity}</span>
-                            <button className="text-muted-foreground hover:text-foreground transition-colors">
+                            <button 
+                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              className="text-muted-foreground hover:text-foreground transition-colors"
+                            >
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                               </svg>
@@ -123,7 +130,7 @@ export default function Cart() {
                         <div className="text-right">
                           <p className="text-sm text-muted-foreground">Subtotal</p>
                           <p className="text-xl font-bold text-primary">
-                            ${(item.price * item.quantity).toFixed(2)}
+                            ₵{(item.price * item.quantity).toFixed(2)}
                           </p>
                         </div>
                       </div>
@@ -154,7 +161,7 @@ export default function Cart() {
                   <div className="space-y-3 py-4 border-y">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Subtotal</span>
-                      <span className="font-medium">${total.toFixed(2)}</span>
+                      <span className="font-medium">₵{total.toFixed(2)}</span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Shipping</span>
@@ -162,14 +169,14 @@ export default function Cart() {
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Tax</span>
-                      <span className="font-medium">${(total * 0.1).toFixed(2)}</span>
+                      <span className="font-medium">₵{(total * 0.1).toFixed(2)}</span>
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between pt-2">
                     <span className="font-display text-lg font-semibold">Total</span>
                     <span className="font-display text-3xl font-bold text-primary">
-                      ${(total * 1.1).toFixed(2)}
+                      ₵{(total * 1.1).toFixed(2)}
                     </span>
                   </div>
 
@@ -185,26 +192,6 @@ export default function Cart() {
                   <p className="text-xs text-center text-muted-foreground">
                     Secure checkout powered by Stripe
                   </p>
-                </div>
-
-                {/* Promo Code */}
-                <div className="bg-muted/50 rounded-2xl border p-6 space-y-3">
-                  <h3 className="font-semibold flex items-center gap-2">
-                    <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                    </svg>
-                    Have a promo code?
-                  </h3>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="Enter code"
-                      className="flex-1 px-4 py-2 rounded-lg border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    />
-                    <Button variant="outline" className="rounded-lg">
-                      Apply
-                    </Button>
-                  </div>
                 </div>
 
                 {/* Trust Badges */}

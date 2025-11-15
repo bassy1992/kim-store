@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Test</title>
+</head>
+<body>
+    <h1>Search Test</h1>
+    <input type="text" id="searchInput" placeholder="Search products..." />
+    <button onclick="testSearch()">Search</button>
+    <div id="results"></div>
+
+    <script>
+        async function testSearch() {
+            const query = document.getElementById('searchInput').value;
+            const resultsDiv = document.getElementById('results');
+            
+            try {
+                console.log('Testing search for:', query);
+                const response = await fetch(`http://localhost:8000/api/products/?search=${query}`);
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                resultsDiv.innerHTML = `
+                    <h3>Results (${data.count}):</h3>
+                    <ul>
+                        ${data.results.map(p => `<li>${p.name} - $${p.price}</li>`).join('')}
+                    </ul>
+                `;
+            } catch (error) {
+                console.error('Search error:', error);
+                resultsDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+        
+        // Test on page load
+        window.onload = function() {
+            document.getElementById('searchInput').value = 'rose';
+            testSearch();
+        };
+    </script>
+</body>
+</html>

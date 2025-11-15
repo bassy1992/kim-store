@@ -23,6 +23,9 @@ import Returns from "./pages/Returns";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import GiftCards from "./pages/GiftCards";
+import Dupes from "./pages/Dupes";
+import PerfumeOils from "./pages/PerfumeOils";
+import AirAmbience from "./pages/AirAmbience";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -57,6 +60,9 @@ const App = () => (
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/gift-cards" element={<GiftCards />} />
+            <Route path="/dupes" element={<Dupes />} />
+            <Route path="/perfume-oils" element={<PerfumeOils />} />
+            <Route path="/air-ambience" element={<AirAmbience />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

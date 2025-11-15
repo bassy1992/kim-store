@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Complete Payment Flow Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .success { color: #28a745; background: #d4edda; padding: 10px; border-radius: 5px; margin: 10px 0; }
+        .error { color: #dc3545; background: #f8d7da; padding: 10px; border-radius: 5px; margin: 10px 0; }
+        .info { color: #0c5460; background: #d1ecf1; padding: 10px; border-radius: 5px; margin: 10px 0; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 5px; }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #6c757d; cursor: not-allowed; }
+        input { padding: 8px; margin: 5px; width: 200px; border: 1px solid #ddd; border-radius: 3px; }
+        .step { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .step.active { border-color: #007bff; background: #f8f9fa; }
+        .step.completed { border-color: #28a745; background: #d4edda; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Complete Payment Flow Test</h1>
+        
+        <div class="info">
+            <strong>This test simulates the complete checkout process:</strong><br>
+            1. Initialize payment with customer details<br>
+            2. Complete payment using test card<br>
+            3. Verify payment and show success
+        </div>
+
+        <!-- Step 1: Customer Details -->
+        <div class="step active" id="step1">
+            <h3>Step 1: Customer Information</h3>
+            <div>
+                <input type="text" id="customerName" placeholder="Full Name" value="John Doe" /><br>
+                <input type="email" id="customerEmail" placeholder="Email" value="john@example.com" /><br>
+                <input type="tel" id="customerPhone" placeholder="Phone" value="+233123456789" /><br>
+                <input type="text" id="customerAddress" placeholder="Address" value="123 Main St, Accra" /><br>
+                <input type="number" id="orderAmount" placeholder="Amount (GHS)" value="25.50" min="1" step="0.01" /><br>
+                <button onclick="initializePayment()">Initialize Payment</button>
+            </div>
+            <div id="step1Results"></div>
+        </div>
+
+        <!-- Step 2: Payment -->
+        <div class="step" id="step2">
+            <h3>Step 2: Complete Payment</h3>
+            <div id="paymentLink"></div>
+            <div>
+                <input type="text" id="paymentReference" placeholder="Payment Reference (from Step 1)" />
+                <button onclick="simulatePaymentSuccess()" disabled id="simulateBtn">Simulate Payment Success</button>
+            </div>
+            <div id="step2Results"></div>
+        </div>
+
+        <!-- Step 3: Verification -->
+        <div class="step" id="step3">
+            <h3>Step 3: Payment Verification</h3>
+            <div>
+                <button onclick="verifyPayment()" disabled id="verifyBtn">Verify Payment</button>
+            </div>
+            <div id="step3Results"></div>
+        </div>
+
+        <!-- Test Card Information -->
+        <div class="info">
+            <strong>Test Card Information:</strong><br>
+            Card Number: <code>4084084084084081</code><br>
+            CVV: <code>123</code><br>
+            Expiry: <code>12/25</code><br>
+            PIN: <code>1234</code>
+        </div>
+    </div>
+
+    <script>
+        let currentReference = '';
+
+        // Step 1: Initialize Payment
+        async function initializePayment() {
+            const name = document.getElementById('customerName').value;
+            const email = document.getElementById('customerEmail').value;
+            const phone = document.getElementById('customerPhone').value;
+            const address = document.getElementById('customerAddress').value;
+            const amount = document.getElementById('orderAmount').value;
+            const resultsDiv = document.getElementById('step1Results');
+            
+            if (!name || !email || !amount) {
+                resultsDiv.innerHTML = '<div class="error">Please fill in all required fields</div>';
+                return;
+            }
+
+            try {
+                resultsDiv.innerHTML = '<div class="info">Initializing payment...</div>';
+                
+                const response = await fetch('http://localhost:3001/api/paystack/initialize', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        amount: parseFloat(amount) * 100, // Convert to pesewas
+                        currency: 'GHS',
+                        metadata: {
+                            full_name: name,
+                            phone: phone,
+                            shipping_address: address,
+                            test_flow: true
+                        },
+                        callback_url: window.location.href
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok && data.status) {
+                    currentReference = data.data.reference;
+                    document.getElementById('paymentReference').value = currentReference;
+                    
+                    resultsDiv.innerHTML = `
+                        <div class="success">
+                            <strong>✅ Payment Initialized!</strong><br>
+                            Reference: <code>${data.data.reference}</code><br>
+                            Amount: GHS ${amount}
+                        </div>
+                    `;
+                    
+                    document.getElementById('paymentLink').innerHTML = `
+                        <a href="${data.data.authorization_url}" target="_blank" style="display: inline-block; padding: 10px 15px; background: #28a745; color: white; text-decoration: none; border-radius: 5px; margin: 10px 0;">
+                            🚀 Complete Payment on Paystack
+                        </a><br>
+                        <small>Click the link above to complete payment, then return here to verify</small>
+                    `;
+                    
+                    // Enable next step
+                    document.getElementById('step1').classList.add('completed');
+                    document.getElementById('step1').classList.remove('active');
+                    document.getElementById('step2').classList.add('active');
+                    document.getElementById('simulateBtn').disabled = false;
+                    
+                } else {
+                    resultsDiv.innerHTML = `<div class="error">❌ Error: ${data.error || 'Payment initialization failed'}</div>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">❌ Network Error: ${error.message}</div>`;
+            }
+        }
+
+        // Step 2: Simulate Payment Success (for testing without actually paying)
+        function simulatePaymentSuccess() {
+            const resultsDiv = document.getElementById('step2Results');
+            resultsDiv.innerHTML = `
+                <div class="success">
+                    <strong>✅ Payment Completed!</strong><br>
+                    Reference: <code>${currentReference}</code><br>
+                    <small>In a real scenario, this would happen after completing payment on Paystack</small>
+                </div>
+            `;
+            
+            // Enable verification step
+            document.getElementById('step2').classList.add('completed');
+            document.getElementById('step2').classList.remove('active');
+            document.getElementById('step3').classList.add('active');
+            document.getElementById('verifyBtn').disabled = false;
+        }
+
+        // Step 3: Verify Payment
+        async function verifyPayment() {
+            const reference = document.getElementById('paymentReference').value || currentReference;
+            const resultsDiv = document.getElementById('step3Results');
+            
+            if (!reference) {
+                resultsDiv.innerHTML = '<div class="error">Please provide a payment reference</div>';
+                return;
+            }
+
+            try {
+                resultsDiv.innerHTML = '<div class="info">Verifying payment...</div>';
+                
+                const response = await fetch(`http://localhost:3001/api/paystack/verify/${reference}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    if (data.status === 'success') {
+                        resultsDiv.innerHTML = `
+                            <div class="success">
+                                <strong>🎉 Payment Verified Successfully!</strong><br>
+                                Status: ${data.status}<br>
+                                Message: ${data.message}<br>
+                                <small>Order would be created in the database at this point</small>
+                            </div>
+                        `;
+                        
+                        document.getElementById('step3').classList.add('completed');
+                        document.getElementById('step3').classList.remove('active');
+                        
+                    } else {
+                        resultsDiv.innerHTML = `
+                            <div class="error">
+                                <strong>❌ Payment Verification Failed</strong><br>
+                                Status: ${data.status}<br>
+                                Message: ${data.message}
+                            </div>
+                        `;
+                    }
+                } else {
+                    resultsDiv.innerHTML = `<div class="error">❌ Verify Error: ${data.error}</div>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">❌ Network Error: ${error.message}</div>`;
+            }
+        }
+
+        // Auto-populate test data
+        window.onload = function() {
+            console.log('🧪 Complete Payment Flow Test Ready');
+            console.log('📋 Test servers should be running:');
+            console.log('   - Frontend: http://localhost:8080');
+            console.log('   - Test API: http://localhost:3001');
+            console.log('   - Django Backend: http://localhost:8000');
+        };
+    </script>
+</body>
+</html>

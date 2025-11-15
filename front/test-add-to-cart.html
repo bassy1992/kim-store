@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add to Cart Debug Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .success { color: #28a745; background: #d4edda; padding: 10px; border-radius: 5px; margin: 10px 0; }
+        .error { color: #dc3545; background: #f8d7da; padding: 10px; border-radius: 5px; margin: 10px 0; }
+        .info { color: #0c5460; background: #d1ecf1; padding: 10px; border-radius: 5px; margin: 10px 0; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 5px; }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #6c757d; cursor: not-allowed; }
+        input, select { padding: 8px; margin: 5px; width: 200px; border: 1px solid #ddd; border-radius: 3px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .product-card { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; background: #f9f9f9; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛒 Add to Cart Debug Test</h1>
+        
+        <div class="info">
+            <strong>This test debugs the add to cart functionality by:</strong><br>
+            1. Testing direct API calls to Django backend<br>
+            2. Simulating frontend cart operations<br>
+            3. Checking for CORS and authentication issues
+        </div>
+
+        <!-- Test 1: Direct API Test -->
+        <div class="test-section">
+            <h3>Test 1: Direct Django API Test</h3>
+            <div>
+                <input type="number" id="testProductId" placeholder="Product ID" value="11" min="1" />
+                <input type="number" id="testQuantity" placeholder="Quantity" value="1" min="1" />
+                <input type="text" id="testSize" placeholder="Size" value="50ml" />
+                <button onclick="testDirectAPI()">Test Direct API</button>
+            </div>
+            <div id="directAPIResults"></div>
+        </div>
+
+        <!-- Test 2: Frontend Simulation -->
+        <div class="test-section">
+            <h3>Test 2: Frontend Cart Context Simulation</h3>
+            <div>
+                <button onclick="testFrontendAddToCart()">Test Frontend Add to Cart</button>
+                <button onclick="fetchCart()">Fetch Current Cart</button>
+                <button onclick="clearCart()">Clear Cart</button>
+            </div>
+            <div id="frontendResults"></div>
+        </div>
+
+        <!-- Test 3: Product Card Simulation -->
+        <div class="test-section">
+            <h3>Test 3: Product Card Simulation</h3>
+            <div class="product-card">
+                <h4>Sample Product</h4>
+                <p><strong>ID:</strong> elegant-rose-perfume</p>
+                <p><strong>Product ID:</strong> 11</p>
+                <p><strong>Name:</strong> Elegant Rose Perfume</p>
+                <p><strong>Price:</strong> ₵89.99</p>
+                <button onclick="simulateProductCardClick()">Add to Cart (Simulate ProductCard)</button>
+            </div>
+            <div id="productCardResults"></div>
+        </div>
+
+        <!-- Test 4: Cart Status -->
+        <div class="test-section">
+            <h3>Test 4: Current Cart Status</h3>
+            <button onclick="getCartStatus()">Get Cart Status</button>
+            <div id="cartStatusResults"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8000/api';
+
+        // Test 1: Direct API Test
+        async function testDirectAPI() {
+            const productId = document.getElementById('testProductId').value;
+            const quantity = document.getElementById('testQuantity').value;
+            const size = document.getElementById('testSize').value;
+            const resultsDiv = document.getElementById('directAPIResults');
+            
+            if (!productId || !quantity) {
+                resultsDiv.innerHTML = '<div class="error">Please provide product ID and quantity</div>';
+                return;
+            }
+
+            try {
+                resultsDiv.innerHTML = '<div class="info">Testing direct API call...</div>';
+                
+                const response = await fetch(`${API_BASE_URL}/cart/items/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        product_id: parseInt(productId),
+                        quantity: parseInt(quantity),
+                        size: size
+                    })
+                });
+
+                console.log('Direct API Response:', response);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultsDiv.innerHTML = `
+                        <div class="success">
+                            <strong>✅ Direct API Success!</strong><br>
+                            Cart ID: ${data.id}<br>
+                            Items: ${data.item_count}<br>
+                            Total: ₵${data.total}
+                        </div>
+                    `;
+                } else {
+                    const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+                    resultsDiv.innerHTML = `
+                        <div class="error">
+                            <strong>❌ Direct API Error</strong><br>
+                            Status: ${response.status}<br>
+                            Error: ${JSON.stringify(errorData)}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">❌ Network Error: ${error.message}</div>`;
+            }
+        }
+
+        // Test 2: Frontend Simulation
+        async function testFrontendAddToCart() {
+            const resultsDiv = document.getElementById('frontendResults');
+            
+            // Simulate the exact same call as the frontend CartContext
+            const item = {
+                id: "elegant-rose-perfume",
+                name: "Elegant Rose Perfume",
+                price: 89.99,
+                image: "https://images.unsplash.com/photo-1541643600914-78b084683601?q=80&w=1400&auto=format&fit=crop",
+                productId: 11
+            };
+
+            try {
+                resultsDiv.innerHTML = '<div class="info">Testing frontend simulation...</div>';
+                
+                // Get product ID - try productId first, then parse id
+                let productId = item.productId;
+                if (!productId) {
+                    const parsedId = parseInt(item.id, 10);
+                    if (isNaN(parsedId) || parsedId <= 0) {
+                        throw new Error(`Invalid product ID: ${item.id}`);
+                    }
+                    productId = parsedId;
+                }
+
+                console.log('Frontend simulation - Adding to cart:', { productId, item });
+
+                const response = await fetch(`${API_BASE_URL}/cart/items/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        product_id: productId,
+                        quantity: 1,
+                        size: '50ml',
+                    }),
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    resultsDiv.innerHTML = `
+                        <div class="success">
+                            <strong>✅ Frontend Simulation Success!</strong><br>
+                            Product: ${item.name}<br>
+                            Cart Total: ₵${data.total}<br>
+                            Items in Cart: ${data.item_count}
+                        </div>
+                    `;
+                } else {
+                    const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+                    resultsDiv.innerHTML = `
+                        <div class="error">
+                            <strong>❌ Frontend Simulation Error</strong><br>
+                            Status: ${response.status}<br>
+                            Error: ${JSON.stringify(error)}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">❌ Frontend Error: ${error.message}</div>`;
+            }
+        }
+
+        // Test 3: Product Card Simulation
+        async function simulateProductCardClick() {
+            const resultsDiv = document.getElementById('productCardResults');
+            
+            // Simulate exact ProductCard data structure
+            const product = {
+                id: "elegant-rose-perfume",
+                name: "Elegant Rose Perfume",
+                price: 89.99,
+                image: "https://images.unsplash.com/photo-1541643600914-78b084683601?q=80&w=1400&auto=format&fit=crop",
+                tag: "Best Seller",
+                productId: 11
+            };
+
+            try {
+                resultsDiv.innerHTML = '<div class="info">Simulating ProductCard click...</div>';
+                
+                // Exact same logic as ProductCard handleAddToCart
+                let productId = product.productId;
+                if (!productId) {
+                    productId = parseInt(product.id, 10);
+                    if (isNaN(productId)) {
+                        throw new Error(`Invalid product ID: ${product.id}`);
+                    }
+                }
+
+                console.log('ProductCard simulation:', { productId, product });
+
+                const response = await fetch(`${API_BASE_URL}/cart/items/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        product_id: productId,
+                        quantity: 1,
+                        size: '50ml',
+                    }),
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    resultsDiv.innerHTML = `
+                        <div class="success">
+                            <strong>🎉 ProductCard Simulation Success!</strong><br>
+                            Added: ${product.name}<br>
+                            Price: ₵${product.price}<br>
+                            Cart Total: ₵${data.total}
+                        </div>
+                    `;
+                } else {
+                    const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+                    resultsDiv.innerHTML = `
+                        <div class="error">
+                            <strong>❌ ProductCard Simulation Error</strong><br>
+                            Status: ${response.status}<br>
+                            Error: ${JSON.stringify(error)}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">❌ ProductCard Error: ${error.message}</div>`;
+            }
+        }
+
+        // Fetch current cart
+        async function fetchCart() {
+            const resultsDiv = document.getElementById('frontendResults');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/cart/`, {
+                    credentials: 'include',
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultsDiv.innerHTML = `
+                        <div class="info">
+                            <strong>📦 Current Cart:</strong><br>
+                            Items: ${data.item_count}<br>
+                            Total: ₵${data.total}<br>
+                            Cart ID: ${data.id}
+                        </div>
+                    `;
+                } else {
+                    resultsDiv.innerHTML = `<div class="error">Failed to fetch cart: ${response.status}</div>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">Cart fetch error: ${error.message}</div>`;
+            }
+        }
+
+        // Clear cart
+        async function clearCart() {
+            const resultsDiv = document.getElementById('frontendResults');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/cart/clear/`, {
+                    method: 'DELETE',
+                    credentials: 'include',
+                });
+                
+                if (response.ok) {
+                    resultsDiv.innerHTML = '<div class="success">✅ Cart cleared successfully</div>';
+                } else {
+                    resultsDiv.innerHTML = `<div class="error">Failed to clear cart: ${response.status}</div>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">Clear cart error: ${error.message}</div>`;
+            }
+        }
+
+        // Get cart status
+        async function getCartStatus() {
+            const resultsDiv = document.getElementById('cartStatusResults');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/cart/`, {
+                    credentials: 'include',
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const itemsHtml = data.items && data.items.length > 0 
+                        ? data.items.map(item => `
+                            <div style="margin: 5px 0; padding: 5px; background: #f0f0f0; border-radius: 3px;">
+                                <strong>${item.product?.name || 'Unknown Product'}</strong><br>
+                                Quantity: ${item.quantity}, Size: ${item.size}, Price: ₵${item.subtotal}
+                            </div>
+                        `).join('')
+                        : '<p>No items in cart</p>';
+                    
+                    resultsDiv.innerHTML = `
+                        <div class="info">
+                            <strong>🛒 Cart Status:</strong><br>
+                            Cart ID: ${data.id}<br>
+                            Total Items: ${data.item_count}<br>
+                            Total Amount: ₵${data.total}<br>
+                            <strong>Items:</strong><br>
+                            ${itemsHtml}
+                        </div>
+                    `;
+                } else {
+                    resultsDiv.innerHTML = `<div class="error">Failed to get cart status: ${response.status}</div>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">Cart status error: ${error.message}</div>`;
+            }
+        }
+
+        // Auto-load cart status on page load
+        window.onload = function() {
+            console.log('🧪 Add to Cart Debug Test Ready');
+            getCartStatus();
+        };
+    </script>
+</body>
+</html>

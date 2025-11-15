@@ -10,7 +10,7 @@ class BlogPostListSerializer(serializers.ModelSerializer):
         model = BlogPost
         fields = [
             'id', 'title', 'slug', 'excerpt', 'author_name',
-            'featured_image', 'published_at', 'created_at'
+            'featured_image_url', 'published_at', 'created_at'
         ]
 
 
@@ -23,7 +23,7 @@ class BlogPostDetailSerializer(serializers.ModelSerializer):
         model = BlogPost
         fields = [
             'id', 'title', 'slug', 'content', 'excerpt',
-            'author_name', 'author_username', 'featured_image',
+            'author_name', 'author_username', 'featured_image_url',
             'is_published', 'published_at', 'created_at', 'updated_at'
         ]
         read_only_fields = ['slug', 'created_at', 'updated_at']
@@ -34,6 +34,6 @@ class BlogPostCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = BlogPost
         fields = [
-            'title', 'content', 'excerpt', 'featured_image',
+            'title', 'content', 'excerpt', 'featured_image_url',
             'is_published', 'published_at'
         ]

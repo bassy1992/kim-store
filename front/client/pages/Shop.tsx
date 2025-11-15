@@ -1,13 +1,28 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useSearchParams } from "react-router-dom";
 import ProductCard from "@/components/site/ProductCard";
 import { productsApi, categoriesApi } from "@/lib/api";
 
 export default function Shop() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [sortBy, setSortBy] = useState("featured");
   const [filterBy, setFilterBy] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+
+  // Initialize search query and filters from URL params
+  useEffect(() => {
+    const urlSearch = searchParams.get('search');
+    const urlCategory = searchParams.get('category');
+    
+    if (urlSearch) {
+      setSearchQuery(urlSearch);
+    }
+    if (urlCategory) {
+      setFilterBy(urlCategory);
+    }
+  }, [searchParams]);
 
   // Fetch categories
   const { data: categoriesData } = useQuery({
@@ -18,11 +33,21 @@ export default function Shop() {
   // Fetch products with filters
   const { data: productsData, isLoading, error } = useQuery({
     queryKey: ['products', filterBy, sortBy, searchQuery],
-    queryFn: () => productsApi.list({
-      category: filterBy !== 'all' ? filterBy : undefined,
-      sort_by: sortBy,
-      search: searchQuery || undefined,
-    }),
+    queryFn: () => {
+      console.log('🔍 Search Query:', searchQuery);
+      console.log('📂 Filter By:', filterBy);
+      console.log('🔄 Sort By:', sortBy);
+      
+      const params = {
+        category: filterBy !== 'all' ? filterBy : undefined,
+        sort_by: sortBy,
+        search: searchQuery || undefined,
+      };
+      
+      console.log('📡 API Params:', params);
+      
+      return productsApi.list(params);
+    },
   });
 
   const products = productsData?.results || [];
@@ -68,7 +93,18 @@ export default function Shop() {
                   type="text"
                   placeholder="Search fragrances..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    console.log('🔤 Search input changed:', e.target.value);
+                    setSearchQuery(e.target.value);
+                    // Update URL params
+                    const newParams = new URLSearchParams(searchParams);
+                    if (e.target.value.trim()) {
+                      newParams.set('search', e.target.value.trim());
+                    } else {
+                      newParams.delete('search');
+                    }
+                    setSearchParams(newParams);
+                  }}
                   className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-muted bg-background/50 backdrop-blur-sm focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all text-base"
                 />
               </div>
@@ -86,7 +122,18 @@ export default function Shop() {
             {categories.map((cat) => (
               <button
                 key={cat}
-                onClick={() => setFilterBy(cat.toLowerCase())}
+                onClick={() => {
+                  const newFilter = cat.toLowerCase() === 'all' ? 'all' : cat.toLowerCase();
+                  setFilterBy(newFilter);
+                  // Update URL params for category filter
+                  const newParams = new URLSearchParams(searchParams);
+                  if (newFilter !== 'all') {
+                    newParams.set('category', newFilter);
+                  } else {
+                    newParams.delete('category');
+                  }
+                  setSearchParams(newParams);
+                }}
                 className={`group relative px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
                   filterBy === cat.toLowerCase()
                     ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25 scale-105"
@@ -186,7 +233,7 @@ export default function Shop() {
         {/* Products Grid/List */}
         {!isLoading && !error && products.length > 0 && (
           <div className={viewMode === "grid" 
-            ? "grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" 
+            ? "grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5" 
             : "space-y-4"
           }>
             {products.map((p: any, i: number) => (
@@ -196,11 +243,12 @@ export default function Shop() {
                 style={{animationDelay: `${i * 50}ms`}}
               >
                 <ProductCard product={{
-                  id: p.slug,
+                  id: String(p.id),
                   name: p.name,
                   price: parseFloat(p.price),
                   image: p.primary_image || "https://images.unsplash.com/photo-1541643600914-78b084683601?q=80&w=1400&auto=format&fit=crop",
                   tag: p.tag,
+                  productId: p.id, // Pass the original numeric ID
                 }} />
               </div>
             ))}
@@ -224,6 +272,8 @@ export default function Shop() {
                 setSearchQuery("");
                 setFilterBy("all");
                 setSortBy("featured");
+                // Clear URL params
+                setSearchParams({});
               }}
               className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors"
             >

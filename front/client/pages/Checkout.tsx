@@ -2,9 +2,10 @@ import { useState } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { initializePaystackPayment, generatePaymentReference } from "@/lib/paystack";
 
 export default function Checkout() {
-  const { items, total } = useCart();
+  const { items, promoCode, subtotal, discountAmount, total, clear, applyPromoCode, removePromoCode } = useCart();
   const [step, setStep] = useState(1);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -15,44 +16,117 @@ export default function Checkout() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const amountCents = Math.round(total * 100);
-  const subtotal = total;
-  const shipping = 0; // Free shipping
-  const tax = total * 0.1;
-  const finalTotal = subtotal + shipping + tax;
+  
+  // Promo code state
+  const [promoCodeInput, setPromoCodeInput] = useState("");
+  const [promoLoading, setPromoLoading] = useState(false);
+  const [promoMessage, setPromoMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  const handlePay = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const shipping = 0; // Free shipping
+  const tax = subtotal * 0.1;
+  const finalTotal = subtotal - discountAmount + shipping + tax;
+
+  const handlePayRedirect = async () => {
     setError(null);
-    if (!email) return setError("Please provide an email.");
-    if (!name) return setError("Please provide your name.");
     setLoading(true);
+    
     try {
-      const res = await fetch("/api/paystack/initialize", {
+      // Initialize Paystack payment
+      const paystackData = {
+        email,
+        amount: Math.round(finalTotal * 100), // Convert to pesewas (smallest currency unit)
+        currency: "GHS",
+        metadata: {
+          full_name: name,
+          phone: phone || 'N/A',
+          shipping_address: `${address}, ${city}${postalCode ? ', ' + postalCode : ''}`,
+          cart_items: items.map(item => ({
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price
+          }))
+        },
+        callback_url: `${window.location.origin}/success`
+      };
+
+      console.log('Initializing Paystack payment with data:', paystackData);
+
+      // Use Django backend API
+      const res = await fetch('http://localhost:8000/api/paystack/initialize/', {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email,
-          amount: Math.round(finalTotal * 100),
-          currency: "GHS",
-          metadata: { name, address, city, postalCode, phone, items },
-        }),
+        headers: { 
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(paystackData),
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || data.message || "Failed to initialize payment");
-
-      if (data.data && data.data.authorization_url) {
-        window.location.href = data.data.authorization_url;
-      } else {
-        throw new Error("No authorization URL returned from Paystack");
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({ message: 'Failed to initialize payment' }));
+        throw new Error(errorData.error || errorData.message || 'Failed to initialize payment');
       }
+
+      const paystackResponse = await res.json();
+      
+      // Redirect to Paystack payment page
+      if (paystackResponse.data && paystackResponse.data.authorization_url) {
+        window.location.href = paystackResponse.data.authorization_url;
+      } else {
+        throw new Error('Invalid payment initialization response');
+      }
+      
     } catch (err: any) {
-      console.error(err);
-      setError(err.message || String(err));
+      console.error('Payment initialization error:', err);
+      setError(err.message || 'Failed to initialize payment. Please try again.');
     } finally {
       setLoading(false);
     }
+  };
+
+
+
+  const handleApplyPromoCode = async () => {
+    if (!promoCodeInput.trim()) {
+      setPromoMessage({ type: 'error', text: 'Please enter a promo code' });
+      return;
+    }
+
+    setPromoLoading(true);
+    setPromoMessage(null);
+
+    const result = await applyPromoCode(promoCodeInput);
+    
+    if (result.success) {
+      setPromoMessage({ type: 'success', text: result.message });
+      setPromoCodeInput("");
+    } else {
+      setPromoMessage({ type: 'error', text: result.message });
+    }
+    
+    setPromoLoading(false);
+  };
+
+  const handleRemovePromoCode = async () => {
+    setPromoLoading(true);
+    await removePromoCode();
+    setPromoMessage(null);
+    setPromoLoading(false);
+  };
+
+  const handlePay = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validation
+    if (!email) return setError("Please provide an email.");
+    if (!name) return setError("Please provide your name.");
+    if (!address) return setError("Please provide your address.");
+    if (!city) return setError("Please provide your city.");
+    
+    // Check if cart has items
+    if (items.length === 0) {
+      return setError("Your cart is empty. Please add items before checking out.");
+    }
+    
+    await handlePayRedirect();
   };
 
   return (
@@ -323,12 +397,73 @@ export default function Checkout() {
                     ))}
                   </div>
 
+                  {/* Promo Code Section */}
+                  <div className="pt-4 border-t">
+                    <h3 className="font-semibold text-sm mb-3">Promo Code</h3>
+                    
+                    {promoCode ? (
+                      <div className="p-3 rounded-lg bg-green-50 border border-green-200">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="font-medium text-green-800">{promoCode.code}</div>
+                            <div className="text-sm text-green-600">{promoCode.description}</div>
+                          </div>
+                          <button
+                            onClick={handleRemovePromoCode}
+                            disabled={promoLoading}
+                            className="text-red-600 hover:text-red-800 text-sm font-medium"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={promoCodeInput}
+                            onChange={(e) => setPromoCodeInput(e.target.value.toUpperCase())}
+                            placeholder="Enter promo code"
+                            className="flex-1 px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                            disabled={promoLoading}
+                          />
+                          <button
+                            onClick={handleApplyPromoCode}
+                            disabled={promoLoading || !promoCodeInput.trim()}
+                            className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {promoLoading ? 'Applying...' : 'Apply'}
+                          </button>
+                        </div>
+                        
+                        {promoMessage && (
+                          <div className={`text-sm p-2 rounded ${
+                            promoMessage.type === 'success' 
+                              ? 'bg-green-50 text-green-700 border border-green-200' 
+                              : 'bg-red-50 text-red-700 border border-red-200'
+                          }`}>
+                            {promoMessage.text}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
                   {/* Totals */}
                   <div className="space-y-3 pt-4 border-t">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Subtotal</span>
                       <span className="font-medium">GHS {subtotal.toFixed(2)}</span>
                     </div>
+                    
+                    {discountAmount > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-green-600">Discount ({promoCode?.code})</span>
+                        <span className="font-medium text-green-600">-GHS {discountAmount.toFixed(2)}</span>
+                      </div>
+                    )}
+                    
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Shipping</span>
                       <span className="font-medium text-green-600">Free</span>

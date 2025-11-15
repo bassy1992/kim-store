@@ -187,7 +187,7 @@ export default function Index() {
         <div className="container py-6 sm:py-8 px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             {[
-              { icon: "🚚", title: "Free Shipping", desc: "On orders over $50" },
+              { icon: "🚚", title: "Free Shipping", desc: "On orders over ₵250" },
               { icon: "✨", title: "Premium Quality", desc: "Luxury ingredients" },
               { icon: "🎁", title: "Gift Wrapping", desc: "Complimentary service" },
               { icon: "💯", title: "Satisfaction", desc: "30-day guarantee" }
@@ -227,15 +227,16 @@ export default function Index() {
                   {products.map((p: any, i: number) => (
                     <div 
                       key={p.id} 
-                      className="flex-none w-[280px] animate-fade-in"
-                      style={{animationDelay: `${i * 100}ms`}}
+                      className="flex-none w-[240px] animate-fade-in"
+                      style={{animationDelay: `${i * 50}ms`}}
                     >
                       <ProductCard product={{
-                        id: p.slug,
+                        id: p.slug || String(p.id),
                         name: p.name,
                         price: parseFloat(p.price),
                         image: p.primary_image || "https://images.unsplash.com/photo-1541643600914-78b084683601?q=80&w=1400&auto=format&fit=crop",
                         tag: p.tag,
+                        productId: p.id, // Pass the original numeric ID
                       }} />
                     </div>
                   ))}

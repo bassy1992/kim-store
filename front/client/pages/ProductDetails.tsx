@@ -16,18 +16,21 @@ const related: Product[] = [
     price: 89,
     image: sampleImages[0],
     tag: "Best Seller",
+    productId: 1, // Add numeric productId
   },
   {
     id: "citrus-noir",
     name: "Citrus Noir",
     price: 79,
     image: sampleImages[1],
+    productId: 2, // Add numeric productId
   },
   {
     id: "amber-oud",
     name: "Amber Oud",
     price: 120,
     image: sampleImages[2],
+    productId: 3, // Add numeric productId
     tag: "New",
   },
 ];
@@ -69,8 +72,8 @@ export default function ProductDetails() {
         <div className="space-y-4 animate-slide-up">
           <h1 className="font-display text-3xl">{productName}</h1>
           <div className="flex items-center gap-4">
-            <div className="text-2xl font-semibold">${price.toFixed(2)}</div>
-            <div className="text-sm text-muted-foreground">Free shipping over $100</div>
+            <div className="text-2xl font-semibold">₵{price.toFixed(2)}</div>
+            <div className="text-sm text-muted-foreground">Free shipping over ₵500</div>
           </div>
 
           <p className="text-muted-foreground">A refined composition blending floral and woody accords with excellent longevity. Top notes: bergamot, neroli. Heart: rose, jasmine. Base: amber, oud.</p>
@@ -98,7 +101,14 @@ export default function ProductDetails() {
           <div className="mt-6 flex flex-col sm:flex-row gap-3">
             <button
               className="w-full sm:w-auto rounded-md bg-primary px-6 py-3 text-primary-foreground font-medium transform transition-transform hover:-translate-y-0.5 active:translate-y-0.5"
-              onClick={() => add({ id: id ?? "sku-unknown", name: productName, price, image }, qty)}
+              onClick={() => add({ 
+                id: id ?? "sku-unknown", 
+                name: productName, 
+                price, 
+                image,
+                productId: id ? parseInt(id) : undefined,
+                size 
+              }, qty)}
             >
               Add to cart
             </button>

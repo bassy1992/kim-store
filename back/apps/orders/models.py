@@ -3,12 +3,91 @@ from django.contrib.auth.models import User
 from apps.products.models import Product
 import uuid
 from datetime import datetime
+from django.core.exceptions import ValidationError
+from decimal import Decimal
+
+
+class PromoCode(models.Model):
+    """Promotional discount codes"""
+    DISCOUNT_TYPES = [
+        ('percentage', 'Percentage'),
+        ('fixed', 'Fixed Amount'),
+    ]
+    
+    code = models.CharField(max_length=50, unique=True)
+    description = models.CharField(max_length=200, blank=True)
+    discount_type = models.CharField(max_length=20, choices=DISCOUNT_TYPES, default='percentage')
+    discount_value = models.DecimalField(max_digits=10, decimal_places=2)
+    minimum_order_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    maximum_discount_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    usage_limit = models.PositiveIntegerField(null=True, blank=True, help_text="Leave blank for unlimited usage")
+    used_count = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    valid_from = models.DateTimeField()
+    valid_until = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.code} - {self.get_discount_display()}"
+    
+    def get_discount_display(self):
+        """Get human-readable discount display"""
+        if self.discount_type == 'percentage':
+            return f"{self.discount_value}% off"
+        else:
+            return f"₵{self.discount_value} off"
+    
+    def is_valid(self):
+        """Check if promo code is currently valid"""
+        from django.utils import timezone
+        now = timezone.now()
+        
+        if not self.is_active:
+            return False, "Promo code is not active"
+        
+        if now < self.valid_from:
+            return False, "Promo code is not yet valid"
+        
+        if now > self.valid_until:
+            return False, "Promo code has expired"
+        
+        if self.usage_limit and self.used_count >= self.usage_limit:
+            return False, "Promo code usage limit reached"
+        
+        return True, "Valid"
+    
+    def calculate_discount(self, order_total):
+        """Calculate discount amount for given order total"""
+        if order_total < self.minimum_order_amount:
+            return Decimal('0.00')
+        
+        if self.discount_type == 'percentage':
+            discount = order_total * (self.discount_value / 100)
+        else:
+            discount = self.discount_value
+        
+        # Apply maximum discount limit if set
+        if self.maximum_discount_amount and discount > self.maximum_discount_amount:
+            discount = self.maximum_discount_amount
+        
+        # Ensure discount doesn't exceed order total
+        return min(discount, order_total)
+    
+    def apply_usage(self):
+        """Increment usage count"""
+        self.used_count += 1
+        self.save(update_fields=['used_count'])
 
 
 class Cart(models.Model):
     """Shopping cart for guest and authenticated users"""
     session_key = models.CharField(max_length=40, blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='carts')
+    promo_code = models.ForeignKey(PromoCode, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -20,9 +99,26 @@ class Cart(models.Model):
             return f"Cart for {self.user.username}"
         return f"Guest cart {self.session_key}"
     
-    def get_total(self):
-        """Calculate total price of all items in cart"""
+    def get_subtotal(self):
+        """Calculate subtotal (before discount)"""
         return sum(item.get_subtotal() for item in self.items.all())
+    
+    def get_discount_amount(self):
+        """Calculate discount amount"""
+        if not self.promo_code:
+            return Decimal('0.00')
+        
+        is_valid, message = self.promo_code.is_valid()
+        if not is_valid:
+            return Decimal('0.00')
+        
+        return self.promo_code.calculate_discount(self.get_subtotal())
+    
+    def get_total(self):
+        """Calculate total price after discount"""
+        subtotal = self.get_subtotal()
+        discount = self.get_discount_amount()
+        return subtotal - discount
     
     def get_item_count(self):
         """Get total number of items in cart"""
@@ -64,7 +160,17 @@ class Order(models.Model):
     shipping_address = models.TextField()
     phone = models.CharField(max_length=20)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    
+    # Pricing fields
+    subtotal_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    # Promo code info (snapshot at time of order)
+    promo_code_used = models.CharField(max_length=50, blank=True)
+    promo_discount_type = models.CharField(max_length=20, blank=True)
+    promo_discount_value = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

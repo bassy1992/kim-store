@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Paystack Integration Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .success { color: green; }
+        .error { color: red; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        input { padding: 8px; margin: 5px; width: 200px; }
+    </style>
+</head>
+<body>
+    <h1>Paystack Integration Test</h1>
+    
+    <div class="test-section">
+        <h3>1. Test Environment Variables</h3>
+        <button onclick="testEnvVars()">Check Environment</button>
+        <div id="envResults"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>2. Test Payment Initialize API</h3>
+        <input type="email" id="testEmail" placeholder="Email" value="test@example.com" />
+        <input type="number" id="testAmount" placeholder="Amount (GHS)" value="10" />
+        <button onclick="testInitialize()">Test Initialize</button>
+        <div id="initResults"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>3. Test Payment Verification</h3>
+        <input type="text" id="testReference" placeholder="Payment Reference" />
+        <button onclick="testVerify()">Test Verify</button>
+        <div id="verifyResults"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>4. Test Inline Payment (Paystack Popup)</h3>
+        <p><strong>Note:</strong> This requires the Paystack public key to be configured.</p>
+        <button onclick="testInlinePayment()">Test Inline Payment</button>
+        <div id="inlineResults"></div>
+    </div>
+
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <script>
+        // Test 1: Environment Variables
+        function testEnvVars() {
+            const resultsDiv = document.getElementById('envResults');
+            
+            // Check if we can access the API
+            fetch('/api/demo')
+                .then(response => response.json())
+                .then(data => {
+                    resultsDiv.innerHTML = `
+                        <div class="success">
+                            ✅ API Server is running<br>
+                            Demo response: ${JSON.stringify(data)}
+                        </div>
+                    `;
+                })
+                .catch(error => {
+                    resultsDiv.innerHTML = `<div class="error">❌ API Server Error: ${error.message}</div>`;
+                });
+        }
+
+        // Test 2: Payment Initialize
+        async function testInitialize() {
+            const email = document.getElementById('testEmail').value;
+            const amount = document.getElementById('testAmount').value;
+            const resultsDiv = document.getElementById('initResults');
+            
+            if (!email || !amount) {
+                resultsDiv.innerHTML = '<div class="error">Please provide email and amount</div>';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/paystack/initialize', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        amount: parseFloat(amount) * 100, // Convert to pesewas
+                        currency: 'GHS',
+                        metadata: {
+                            test: true,
+                            full_name: 'Test User'
+                        }
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultsDiv.innerHTML = `
+                        <div class="success">
+                            ✅ Payment Initialize Successful!<br>
+                            Reference: ${data.data.reference}<br>
+                            <a href="${data.data.authorization_url}" target="_blank">Open Payment Page</a>
+                        </div>
+                    `;
+                } else {
+                    resultsDiv.innerHTML = `<div class="error">❌ Initialize Error: ${data.error}</div>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">❌ Network Error: ${error.message}</div>`;
+            }
+        }
+
+        // Test 3: Payment Verification
+        async function testVerify() {
+            const reference = document.getElementById('testReference').value;
+            const resultsDiv = document.getElementById('verifyResults');
+            
+            if (!reference) {
+                resultsDiv.innerHTML = '<div class="error">Please provide a payment reference</div>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/paystack/verify/${reference}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultsDiv.innerHTML = `
+                        <div class="success">
+                            ✅ Verification Response:<br>
+                            Status: ${data.status}<br>
+                            Message: ${data.message}<br>
+                            ${data.order ? `Order: ${JSON.stringify(data.order, null, 2)}` : ''}
+                        </div>
+                    `;
+                } else {
+                    resultsDiv.innerHTML = `<div class="error">❌ Verify Error: ${data.error}</div>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">❌ Network Error: ${error.message}</div>`;
+            }
+        }
+
+        // Test 4: Inline Payment
+        function testInlinePayment() {
+            const resultsDiv = document.getElementById('inlineResults');
+            
+            if (!window.PaystackPop) {
+                resultsDiv.innerHTML = '<div class="error">❌ Paystack script not loaded</div>';
+                return;
+            }
+
+            try {
+                const handler = PaystackPop.setup({
+                    key: 'pk_test_8fa4755aaf7766fcd7927277e528ebc3ef2cbcff', // Your test public key
+                    email: 'test@example.com',
+                    amount: 1000, // 10 GHS in pesewas
+                    currency: 'GHS',
+                    ref: 'test_' + Math.floor((Math.random() * 1000000000) + 1),
+                    metadata: {
+                        test: true,
+                        full_name: 'Test User'
+                    },
+                    callback: function(response) {
+                        resultsDiv.innerHTML = `
+                            <div class="success">
+                                ✅ Payment Successful!<br>
+                                Reference: ${response.reference}<br>
+                                Message: ${response.message}
+                            </div>
+                        `;
+                    },
+                    onClose: function() {
+                        resultsDiv.innerHTML = '<div>Payment popup closed</div>';
+                    }
+                });
+                
+                handler.openIframe();
+                resultsDiv.innerHTML = '<div>Payment popup opened...</div>';
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">❌ Inline Payment Error: ${error.message}</div>`;
+            }
+        }
+
+        // Auto-run environment test
+        window.onload = function() {
+            testEnvVars();
+        };
+    </script>
+</body>
+</html>

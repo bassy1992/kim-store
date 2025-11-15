@@ -38,9 +38,22 @@ export interface CartItem {
   subtotal: number;
 }
 
+export interface PromoCode {
+  id: number;
+  code: string;
+  description: string;
+  discount_type: 'percentage' | 'fixed';
+  discount_value: number;
+  discount_display: string;
+  minimum_order_amount: number;
+}
+
 export interface Cart {
   id: number;
   items: CartItem[];
+  promo_code?: PromoCode;
+  subtotal: number;
+  discount_amount: number;
   total: number;
   item_count: number;
 }
@@ -158,8 +171,10 @@ export const productsApi = {
         }
       });
     }
+    const url = `/products/?${queryParams}`;
+    console.log('🌐 API URL:', `${API_BASE_URL}${url}`);
     return apiFetch<{ results: Product[]; count: number; next: string | null; previous: string | null }>(
-      `/products/?${queryParams}`
+      url
     );
   },
 
@@ -207,6 +222,17 @@ export const cartApi = {
     apiFetch<Cart>(`/cart/items/${itemId}/`, { method: 'DELETE' }),
 
   clear: () => apiFetch<Cart>('/cart/clear/', { method: 'DELETE' }),
+
+  applyPromoCode: (code: string) =>
+    apiFetch<{ message: string; cart: Cart }>('/cart/apply-promo/', {
+      method: 'POST',
+      body: JSON.stringify({ code }),
+    }),
+
+  removePromoCode: () =>
+    apiFetch<{ message: string; cart: Cart }>('/cart/remove-promo/', {
+      method: 'POST',
+    }),
 };
 
 // Orders API

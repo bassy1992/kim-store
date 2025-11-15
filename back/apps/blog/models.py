@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.text import slugify
-from apps.products.validators import validate_image_file_extension, validate_image_file_size
 
 
 class BlogPost(models.Model):
@@ -11,11 +10,10 @@ class BlogPost(models.Model):
     content = models.TextField()
     excerpt = models.TextField(blank=True, help_text="Short summary for list views")
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blog_posts')
-    featured_image = models.ImageField(
-        upload_to='blog/',
+    featured_image_url = models.URLField(
+        max_length=500,
         blank=True,
-        null=True,
-        validators=[validate_image_file_extension, validate_image_file_size]
+        help_text="URL of the blog post featured image"
     )
     is_published = models.BooleanField(default=False)
     published_at = models.DateTimeField(null=True, blank=True)

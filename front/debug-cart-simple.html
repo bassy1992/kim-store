@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Cart Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Simple Cart Debug</h1>
+    
+    <button onclick="testGetCart()">1. Get Cart</button>
+    <button onclick="testAddToCart()">2. Add Item to Cart</button>
+    <button onclick="testCartStatus()">3. Check Cart Status</button>
+    <button onclick="testDebugInfo()">4. Debug Info</button>
+    
+    <div id="results"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api';
+        
+        function log(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+            document.getElementById('results').appendChild(div);
+            console.log(message);
+        }
+
+        async function testGetCart() {
+            try {
+                log('Testing GET /api/cart/', 'info');
+                
+                const response = await fetch(`${API_BASE}/cart/`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                log(`Response status: ${response.status}`, 'info');
+                log(`Response headers: ${JSON.stringify(Object.fromEntries(response.headers.entries()))}`, 'info');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ Cart retrieved: ID=${data.id}, Items=${data.item_count}, Total=₵${data.total}`, 'success');
+                } else {
+                    const error = await response.text();
+                    log(`❌ Failed to get cart: ${error}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Network error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAddToCart() {
+            try {
+                log('Testing POST /api/cart/items/', 'info');
+                
+                const requestBody = {
+                    product_id: 11,
+                    quantity: 1,
+                    size: '50ml'
+                };
+                
+                log(`Request body: ${JSON.stringify(requestBody)}`, 'info');
+                
+                const response = await fetch(`${API_BASE}/cart/items/`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+                
+                log(`Response status: ${response.status}`, 'info');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ Item added to cart: Items=${data.item_count}, Total=₵${data.total}`, 'success');
+                } else {
+                    const error = await response.text();
+                    log(`❌ Failed to add to cart: ${error}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Network error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCartStatus() {
+            try {
+                const response = await fetch(`${API_BASE}/cart/`, {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`📦 Current cart status: ID=${data.id}, Items=${data.item_count}, Total=₵${data.total}`, 'info');
+                    
+                    if (data.items && data.items.length > 0) {
+                        data.items.forEach((item, index) => {
+                            log(`   Item ${index + 1}: ${item.product?.name || 'Unknown'} x${item.quantity} (₵${item.subtotal})`, 'info');
+                        });
+                    } else {
+                        log('   Cart is empty', 'info');
+                    }
+                } else {
+                    log(`❌ Failed to get cart status: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Error getting cart status: ${error.message}`, 'error');
+            }
+        }
+
+        async function testDebugInfo() {
+            try {
+                log('Getting debug information...', 'info');
+                
+                const response = await fetch(`${API_BASE}/cart/debug/`, {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`🔍 Debug Info:`, 'info');
+                    log(`   Session Key: ${data.session_key}`, 'info');
+                    log(`   User: ${data.user}`, 'info');
+                    log(`   Is Authenticated: ${data.is_authenticated}`, 'info');
+                    log(`   Total Carts in DB: ${data.all_carts_count}`, 'info');
+                    log(`   User Carts: ${data.user_carts_count}`, 'info');
+                    log(`   Session Carts: ${data.session_carts_count}`, 'info');
+                    
+                    if (data.all_carts && data.all_carts.length > 0) {
+                        log(`   All Carts:`, 'info');
+                        data.all_carts.forEach(cart => {
+                            log(`     Cart ${cart.id}: User=${cart.user || 'Guest'}, Session=${cart.session_key || 'None'}, Items=${cart.items_count}, Total=₵${cart.total}`, 'info');
+                        });
+                    }
+                } else {
+                    log(`❌ Failed to get debug info: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Error getting debug info: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-run initial test
+        window.onload = function() {
+            log('🚀 Simple Cart Debug Loaded', 'success');
+            log('Click buttons above to test cart functionality', 'info');
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Functionality Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .success { color: green; }
+        .error { color: red; }
+        input { padding: 8px; margin: 5px; width: 200px; }
+        button { padding: 8px 15px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Search Functionality Test</h1>
+    
+    <div class="test-section">
+        <h3>1. Test Backend API Directly</h3>
+        <input type="text" id="apiSearchInput" placeholder="Search term..." value="rose" />
+        <button onclick="testBackendAPI()">Test Backend API</button>
+        <div id="apiResults"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>2. Test Frontend API Client</h3>
+        <input type="text" id="frontendSearchInput" placeholder="Search term..." value="rose" />
+        <button onclick="testFrontendAPI()">Test Frontend API</button>
+        <div id="frontendResults"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>3. Test Different Search Terms</h3>
+        <button onclick="testSearchTerms()">Test Multiple Terms</button>
+        <div id="multipleResults"></div>
+    </div>
+
+    <script>
+        // Test 1: Direct backend API call
+        async function testBackendAPI() {
+            const query = document.getElementById('apiSearchInput').value;
+            const resultsDiv = document.getElementById('apiResults');
+            
+            try {
+                console.log('Testing backend API for:', query);
+                const response = await fetch(`http://localhost:8000/api/products/?search=${encodeURIComponent(query)}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('Backend API Response:', data);
+                
+                resultsDiv.innerHTML = `
+                    <div class="success">
+                        <strong>✅ Backend API Working!</strong><br>
+                        Found ${data.count} products<br>
+                        Results: ${data.results.map(p => p.name).join(', ')}
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Backend API Error:', error);
+                resultsDiv.innerHTML = `<div class="error">❌ Backend API Error: ${error.message}</div>`;
+            }
+        }
+
+        // Test 2: Frontend API client (simulating the actual frontend call)
+        async function testFrontendAPI() {
+            const query = document.getElementById('frontendSearchInput').value;
+            const resultsDiv = document.getElementById('frontendResults');
+            
+            try {
+                console.log('Testing frontend API client for:', query);
+                
+                // Simulate the frontend API call
+                const API_BASE_URL = 'http://localhost:8000/api';
+                const params = new URLSearchParams();
+                if (query) params.append('search', query);
+                
+                const url = `${API_BASE_URL}/products/?${params}`;
+                console.log('Frontend API URL:', url);
+                
+                const response = await fetch(url, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('Frontend API Response:', data);
+                
+                resultsDiv.innerHTML = `
+                    <div class="success">
+                        <strong>✅ Frontend API Client Working!</strong><br>
+                        Found ${data.count} products<br>
+                        Results: ${data.results.map(p => p.name).join(', ')}
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Frontend API Error:', error);
+                resultsDiv.innerHTML = `<div class="error">❌ Frontend API Error: ${error.message}</div>`;
+            }
+        }
+
+        // Test 3: Multiple search terms
+        async function testSearchTerms() {
+            const resultsDiv = document.getElementById('multipleResults');
+            const searchTerms = ['rose', 'citrus', 'woody', 'floral', 'perfume'];
+            
+            resultsDiv.innerHTML = '<div>Testing multiple search terms...</div>';
+            
+            const results = [];
+            
+            for (const term of searchTerms) {
+                try {
+                    const response = await fetch(`http://localhost:8000/api/products/?search=${encodeURIComponent(term)}`);
+                    const data = await response.json();
+                    results.push({
+                        term,
+                        count: data.count,
+                        success: true,
+                        products: data.results.map(p => p.name)
+                    });
+                } catch (error) {
+                    results.push({
+                        term,
+                        success: false,
+                        error: error.message
+                    });
+                }
+            }
+            
+            const html = results.map(result => {
+                if (result.success) {
+                    return `
+                        <div class="success">
+                            <strong>"${result.term}"</strong>: ${result.count} results
+                            ${result.count > 0 ? `<br>Products: ${result.products.slice(0, 3).join(', ')}${result.products.length > 3 ? '...' : ''}` : ''}
+                        </div>
+                    `;
+                } else {
+                    return `<div class="error"><strong>"${result.term}"</strong>: Error - ${result.error}</div>`;
+                }
+            }).join('');
+            
+            resultsDiv.innerHTML = html;
+        }
+
+        // Auto-run tests on page load
+        window.onload = function() {
+            console.log('Running automatic tests...');
+            testBackendAPI();
+            setTimeout(() => testFrontendAPI(), 1000);
+            setTimeout(() => testSearchTerms(), 2000);
+        };
+    </script>
+</body>
+</html>

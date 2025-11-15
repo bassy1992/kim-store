@@ -3,13 +3,14 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.shortcuts import get_object_or_404
-from .models import Cart, CartItem, Order
+from .models import Cart, CartItem, Order, PromoCode
 from apps.products.models import Product
 from .serializers import (
     CartSerializer,
     CartItemSerializer,
     OrderSerializer,
-    OrderCreateSerializer
+    OrderCreateSerializer,
+    PromoCodeSerializer
 )
 
 
@@ -24,13 +25,16 @@ class CartViewSet(viewsets.ViewSet):
         """Get or create cart for current user/session"""
         if request.user.is_authenticated:
             cart, created = Cart.objects.get_or_create(user=request.user)
+            print(f"Authenticated user cart: {cart.id}, created: {created}")
         else:
             # Use session key for guest users
             session_key = request.session.session_key
             if not session_key:
                 request.session.create()
                 session_key = request.session.session_key
+                print(f"Created new session: {session_key}")
             cart, created = Cart.objects.get_or_create(session_key=session_key)
+            print(f"Guest cart: {cart.id}, session: {session_key}, created: {created}")
         return cart
     
     def list(self, request):
@@ -78,7 +82,6 @@ class CartViewSet(viewsets.ViewSet):
         serializer = CartSerializer(cart, context={'request': request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
-    @action(detail=False, methods=['put'], url_path='items/(?P<item_id>[^/.]+)')
     def update_item(self, request, item_id=None):
         """Update cart item quantity"""
         cart = self.get_cart(request)
@@ -101,7 +104,6 @@ class CartViewSet(viewsets.ViewSet):
         serializer = CartSerializer(cart, context={'request': request})
         return Response(serializer.data)
     
-    @action(detail=False, methods=['delete'], url_path='items/(?P<item_id>[^/.]+)')
     def remove_item(self, request, item_id=None):
         """Remove item from cart"""
         cart = self.get_cart(request)
@@ -116,9 +118,102 @@ class CartViewSet(viewsets.ViewSet):
         """Clear all items from cart"""
         cart = self.get_cart(request)
         cart.items.all().delete()
+        cart.promo_code = None
+        cart.save()
         
         serializer = CartSerializer(cart, context={'request': request})
         return Response(serializer.data)
+    
+    @action(detail=False, methods=['post'], url_path='apply-promo')
+    def apply_promo_code(self, request):
+        """Apply promo code to cart"""
+        cart = self.get_cart(request)
+        promo_code = request.data.get('code', '').strip().upper()
+        
+        if not promo_code:
+            return Response(
+                {'error': 'Promo code is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            promo = PromoCode.objects.get(code=promo_code)
+        except PromoCode.DoesNotExist:
+            return Response(
+                {'error': 'Invalid promo code'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Check if promo code is valid
+        is_valid, message = promo.is_valid()
+        if not is_valid:
+            return Response(
+                {'error': message},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Check minimum order amount
+        cart_subtotal = cart.get_subtotal()
+        if cart_subtotal < promo.minimum_order_amount:
+            return Response(
+                {'error': f'Minimum order amount of ₵{promo.minimum_order_amount} required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Apply promo code
+        cart.promo_code = promo
+        cart.save()
+        
+        serializer = CartSerializer(cart, context={'request': request})
+        return Response({
+            'message': f'Promo code "{promo_code}" applied successfully!',
+            'cart': serializer.data
+        })
+    
+    @action(detail=False, methods=['post'], url_path='remove-promo')
+    def remove_promo_code(self, request):
+        """Remove promo code from cart"""
+        cart = self.get_cart(request)
+        cart.promo_code = None
+        cart.save()
+        
+        serializer = CartSerializer(cart, context={'request': request})
+        return Response({
+            'message': 'Promo code removed',
+            'cart': serializer.data
+        })
+    
+    @action(detail=False, methods=['get'], url_path='debug')
+    def debug_cart(self, request):
+        """Debug cart information"""
+        session_key = request.session.session_key
+        user = request.user
+        
+        # Get all carts
+        all_carts = Cart.objects.all()
+        user_carts = Cart.objects.filter(user=user) if user.is_authenticated else []
+        session_carts = Cart.objects.filter(session_key=session_key) if session_key else []
+        
+        debug_info = {
+            'session_key': session_key,
+            'user': str(user),
+            'is_authenticated': user.is_authenticated,
+            'all_carts_count': all_carts.count(),
+            'user_carts_count': len(user_carts),
+            'session_carts_count': len(session_carts),
+            'all_carts': [
+                {
+                    'id': cart.id,
+                    'user': str(cart.user) if cart.user else None,
+                    'session_key': cart.session_key,
+                    'items_count': cart.items.count(),
+                    'total': float(cart.get_total())
+                }
+                for cart in all_carts
+            ]
+        }
+        
+        return Response(debug_info)
 
 
 class OrderViewSet(viewsets.ModelViewSet):
@@ -139,18 +234,44 @@ class OrderViewSet(viewsets.ModelViewSet):
     
     def create(self, request):
         """Create order from cart"""
+        # Debug logging
+        print(f"Order creation request from user: {request.user}")
+        print(f"Session key: {request.session.session_key}")
+        print(f"Request data: {request.data}")
+        
         # Get cart
         if request.user.is_authenticated:
             cart = Cart.objects.filter(user=request.user).first()
+            print(f"Looking for authenticated user cart: {cart}")
         else:
             session_key = request.session.session_key
-            cart = Cart.objects.filter(session_key=session_key).first() if session_key else None
+            if not session_key:
+                # Create session if it doesn't exist
+                request.session.create()
+                session_key = request.session.session_key
+                print(f"Created new session: {session_key}")
+            
+            cart = Cart.objects.filter(session_key=session_key).first()
+            print(f"Looking for guest cart with session {session_key}: {cart}")
         
         if not cart:
+            # Try to find any cart for debugging
+            all_carts = Cart.objects.all()
+            print(f"No cart found. All carts in database: {list(all_carts)}")
             return Response(
-                {'error': 'No cart found'},
+                {'error': 'No cart found', 'debug': f'Session: {request.session.session_key}, User: {request.user}'},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        
+        # Check if cart has items
+        if not cart.items.exists():
+            print(f"Cart {cart.id} exists but has no items")
+            return Response(
+                {'error': 'Cart is empty'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        print(f"Found cart {cart.id} with {cart.items.count()} items")
         
         # Create order
         serializer = OrderCreateSerializer(
@@ -160,9 +281,11 @@ class OrderViewSet(viewsets.ModelViewSet):
         
         if serializer.is_valid():
             order = serializer.save()
+            print(f"Order created successfully: {order.order_number}")
             order_serializer = OrderSerializer(order)
             return Response(order_serializer.data, status=status.HTTP_201_CREATED)
         
+        print(f"Order creation validation errors: {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def retrieve(self, request, order_number=None):

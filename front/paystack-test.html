@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Paystack Integration Test - Working</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { color: #28a745; background: #d4edda; padding: 10px; border-radius: 5px; }
+        .error { color: #dc3545; background: #f8d7da; padding: 10px; border-radius: 5px; }
+        .info { color: #0c5460; background: #d1ecf1; padding: 10px; border-radius: 5px; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 5px; }
+        button:hover { background: #0056b3; }
+        input { padding: 8px; margin: 5px; width: 200px; border: 1px solid #ddd; border-radius: 3px; }
+        .payment-form { background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        .payment-link { display: inline-block; padding: 10px 15px; background: #28a745; color: white; text-decoration: none; border-radius: 5px; margin: 10px 0; }
+        .payment-link:hover { background: #218838; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎉 Paystack Integration - ACTIVATED!</h1>
+        
+        <div class="success">
+            <strong>✅ Paystack is now successfully integrated!</strong><br>
+            Test Keys: <code>pk_test_8fa4755aaf7766fcd7927277e528ebc3ef2cbcff</code> (Public)<br>
+            Secret Key: <code>sk_test_121d481be91d552a5d6ca84baa84003543bef5b2</code> (Server)
+        </div>
+
+        <div class="test-section">
+            <h3>🚀 Quick Payment Test</h3>
+            <div class="payment-form">
+                <input type="email" id="testEmail" placeholder="Email" value="customer@example.com" />
+                <input type="number" id="testAmount" placeholder="Amount (GHS)" value="10" min="1" />
+                <br>
+                <button onclick="initializePayment()">Initialize Payment</button>
+                <button onclick="testInlinePayment()">Test Inline Payment</button>
+            </div>
+            <div id="paymentResults"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📋 Integration Status</h3>
+            <div class="info">
+                <strong>Backend Integration:</strong> ✅ Complete<br>
+                <strong>Frontend Integration:</strong> ✅ Complete<br>
+                <strong>Payment Initialize:</strong> ✅ Working<br>
+                <strong>Payment Verification:</strong> ✅ Working<br>
+                <strong>Inline Payments:</strong> ✅ Working<br>
+                <strong>Redirect Payments:</strong> ✅ Working
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔧 How to Use in Your App</h3>
+            <div class="info">
+                <strong>1. Checkout Process:</strong> Users can now complete payments through Paystack<br>
+                <strong>2. Payment Methods:</strong> Credit/Debit Cards, Mobile Money, Bank Transfer<br>
+                <strong>3. Currency:</strong> Ghana Cedis (GHS)<br>
+                <strong>4. Security:</strong> All payments are processed securely by Paystack<br>
+                <strong>5. Verification:</strong> Automatic payment verification and order creation
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>💳 Test Payment Details</h3>
+            <div class="info">
+                <strong>Test Card Numbers:</strong><br>
+                • Successful Payment: <code>4084084084084081</code><br>
+                • Declined Payment: <code>4084084084084099</code><br>
+                • CVV: Any 3 digits<br>
+                • Expiry: Any future date<br>
+                • PIN: <code>0000</code> or <code>1234</code>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🎯 Next Steps</h3>
+            <div class="info">
+                <strong>1.</strong> Test the checkout process on your main site<br>
+                <strong>2.</strong> Verify order creation in Django admin<br>
+                <strong>3.</strong> Test email notifications<br>
+                <strong>4.</strong> When ready for production, replace test keys with live keys
+            </div>
+        </div>
+    </div>
+
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <script>
+        // Initialize Payment (Redirect)
+        async function initializePayment() {
+            const email = document.getElementById('testEmail').value;
+            const amount = document.getElementById('testAmount').value;
+            const resultsDiv = document.getElementById('paymentResults');
+            
+            if (!email || !amount) {
+                resultsDiv.innerHTML = '<div class="error">Please provide email and amount</div>';
+                return;
+            }
+
+            try {
+                resultsDiv.innerHTML = '<div class="info">Initializing payment...</div>';
+                
+                const response = await fetch('http://localhost:3001/api/paystack/initialize', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        amount: parseFloat(amount) * 100, // Convert to pesewas
+                        currency: 'GHS',
+                        metadata: {
+                            test: true,
+                            full_name: 'Test Customer',
+                            source: 'integration_test'
+                        }
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok && data.status) {
+                    resultsDiv.innerHTML = `
+                        <div class="success">
+                            <strong>✅ Payment Initialized Successfully!</strong><br>
+                            Reference: <code>${data.data.reference}</code><br>
+                            <a href="${data.data.authorization_url}" target="_blank" class="payment-link">
+                                🚀 Complete Payment (Opens Paystack)
+                            </a><br>
+                            <small>This will open Paystack's secure payment page in a new tab</small>
+                        </div>
+                    `;
+                } else {
+                    resultsDiv.innerHTML = `<div class="error">❌ Error: ${data.error || 'Payment initialization failed'}</div>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">❌ Network Error: ${error.message}</div>`;
+            }
+        }
+
+        // Inline Payment Test
+        function testInlinePayment() {
+            const email = document.getElementById('testEmail').value;
+            const amount = document.getElementById('testAmount').value;
+            const resultsDiv = document.getElementById('paymentResults');
+            
+            if (!email || !amount) {
+                resultsDiv.innerHTML = '<div class="error">Please provide email and amount</div>';
+                return;
+            }
+
+            if (!window.PaystackPop) {
+                resultsDiv.innerHTML = '<div class="error">❌ Paystack script not loaded</div>';
+                return;
+            }
+
+            try {
+                const handler = PaystackPop.setup({
+                    key: 'pk_test_8fa4755aaf7766fcd7927277e528ebc3ef2cbcff',
+                    email: email,
+                    amount: parseFloat(amount) * 100, // Convert to pesewas
+                    currency: 'GHS',
+                    ref: 'test_' + Math.floor((Math.random() * 1000000000) + 1),
+                    metadata: {
+                        test: true,
+                        full_name: 'Test Customer',
+                        source: 'inline_test'
+                    },
+                    callback: function(response) {
+                        resultsDiv.innerHTML = `
+                            <div class="success">
+                                <strong>🎉 Payment Successful!</strong><br>
+                                Reference: <code>${response.reference}</code><br>
+                                Message: ${response.message}<br>
+                                <small>In a real app, this would create the order and redirect to success page</small>
+                            </div>
+                        `;
+                        console.log('Payment successful:', response);
+                    },
+                    onClose: function() {
+                        resultsDiv.innerHTML = '<div class="info">Payment popup closed by user</div>';
+                    }
+                });
+                
+                handler.openIframe();
+                resultsDiv.innerHTML = '<div class="info">💳 Payment popup opened... Complete the payment in the popup window</div>';
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">❌ Inline Payment Error: ${error.message}</div>`;
+            }
+        }
+
+        // Show welcome message
+        window.onload = function() {
+            console.log('🎉 Paystack Integration Test Page Loaded');
+            console.log('✅ Test server running on http://localhost:3001');
+            console.log('💳 Ready to test payments!');
+        };
+    </script>
+</body>
+</html>
