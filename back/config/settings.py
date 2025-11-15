@@ -26,7 +26,7 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-y6oez^lqs5+wkq4tij39#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,.railway.app,.up.railway.app').split(',')
+ALLOWED_HOSTS = ['*']  # Allow all hosts for debugging
 
 # CSRF Settings
 CSRF_TRUSTED_ORIGINS = [
@@ -229,9 +229,9 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'config.exceptions.custom_exception_handler',
 }
 
-# CORS settings - Fixed for Railway deployment
-# Temporary: Allow all origins for debugging CORS issues
-CORS_ALLOW_ALL_ORIGINS = config('CORS_ALLOW_ALL_ORIGINS', default=True, cast=bool)
+# CORS settings - Emergency fix for Railway deployment
+# Force allow all origins for debugging CORS issues
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Specific allowed origins (used when CORS_ALLOW_ALL_ORIGINS is False)
 cors_origins_str = config(

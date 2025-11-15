@@ -26,9 +26,10 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from . import admin as custom_admin
 from .test_views import api_status, api_stats, health_check, cors_test
 from .simple_cors_view import simple_cors_test
+from .emergency_cors import emergency_cors_handler, EmergencyCorsView
 
 urlpatterns = [
-    path('', RedirectView.as_view(url='/api/docs/', permanent=False)),
+    path('', simple_cors_test, name='root_cors_test'),  # Root endpoint for testing
     path('admin/', admin.site.urls),
     
     # Test endpoints for frontend connection
@@ -37,6 +38,8 @@ urlpatterns = [
     path('api/stats/', api_stats, name='api_stats'),
     path('api/cors-test/', cors_test, name='cors_test'),
     path('simple-cors-test/', simple_cors_test, name='simple_cors_test'),
+    path('emergency-cors/', emergency_cors_handler, name='emergency_cors'),
+    path('emergency/', EmergencyCorsView.as_view(), name='emergency_cors_view'),
     
     # API documentation
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
