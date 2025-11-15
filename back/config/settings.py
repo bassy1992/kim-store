@@ -49,6 +49,13 @@ CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_USE_SESSIONS = False
 CSRF_COOKIE_NAME = 'csrftoken'
 
+# Temporarily disable CSRF for API endpoints
+CSRF_EXEMPT_URLS = [
+    r'^/api/',
+    r'^/simple-cors-test/',
+    r'^/health/',
+]
+
 # Additional CSRF settings for Railway
 CSRF_COOKIE_DOMAIN = None
 CSRF_COOKIE_PATH = '/'
@@ -84,12 +91,13 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'config.cors_middleware.CustomCorsMiddleware',  # Custom CORS as backup
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # Serve static files
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    'config.csrf_middleware.CustomCsrfMiddleware',  # Custom CSRF with exemptions
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',

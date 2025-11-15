@@ -25,6 +25,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 # Import admin customization
 from . import admin as custom_admin
 from .test_views import api_status, api_stats, health_check, cors_test
+from .simple_cors_view import simple_cors_test
 
 urlpatterns = [
     path('', RedirectView.as_view(url='/api/docs/', permanent=False)),
@@ -35,6 +36,7 @@ urlpatterns = [
     path('api/status/', api_status, name='api_status'),
     path('api/stats/', api_stats, name='api_stats'),
     path('api/cors-test/', cors_test, name='cors_test'),
+    path('simple-cors-test/', simple_cors_test, name='simple_cors_test'),
     
     # API documentation
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
