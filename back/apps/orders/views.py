@@ -37,17 +37,27 @@ class CartViewSet(viewsets.ViewSet):
             # Ensure session is saved to database
             request.session.save()
             
+            # Get all carts for this session to debug
+            existing_carts = Cart.objects.filter(session_key=session_key)
+            print(f"Existing carts for session {session_key}: {existing_carts.count()}")
+            for c in existing_carts:
+                print(f"  - Cart {c.id}: {c.items.count()} items")
+            
             cart, created = Cart.objects.get_or_create(session_key=session_key)
-            print(f"Guest cart: {cart.id}, session: {session_key}, created: {created}")
+            print(f"Guest cart: {cart.id}, session: {session_key}, created: {created}, items: {cart.items.count()}")
         return cart
     
     def list(self, request):
         """Get current cart"""
         cart = self.get_cart(request)
+        print(f"LIST: Getting cart {cart.id}, items: {cart.items.count()}")
         # Ensure items are loaded
         cart = Cart.objects.prefetch_related('items__product').get(id=cart.id)
+        print(f"LIST: After prefetch, cart {cart.id}, items: {cart.items.count()}")
         serializer = CartSerializer(cart, context={'request': request})
-        return Response(serializer.data)
+        response = Response(serializer.data)
+        response['X-Cart-ID'] = str(cart.id)
+        return response
     
     @action(detail=False, methods=['post'], url_path='items')
     def add_item(self, request):
@@ -99,9 +109,11 @@ class CartViewSet(viewsets.ViewSet):
         print(f"After prefetch - Cart items count: {cart.items.count()}")
         
         serializer = CartSerializer(cart, context={'request': request})
-        print(f"Serialized cart data: {serializer.data}")
+        print(f"Serialized cart data items: {len(serializer.data.get('items', []))}")
         
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        response = Response(serializer.data, status=status.HTTP_201_CREATED)
+        response['X-Cart-ID'] = str(cart.id)
+        return response
     
     def update_item(self, request, item_id=None):
         """Update cart item quantity"""
