@@ -229,14 +229,14 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'config.exceptions.custom_exception_handler',
 }
 
-# CORS settings - Emergency fix for Railway deployment
-# Force allow all origins for debugging CORS issues
+# CORS settings - Allow all origins (wildcard)
+# This works without credentials in requests
 CORS_ALLOW_ALL_ORIGINS = True
 
-# Specific allowed origins (used when CORS_ALLOW_ALL_ORIGINS is False)
+# Specific allowed origins (backup, not used when CORS_ALLOW_ALL_ORIGINS is True)
 cors_origins_str = config(
     'CORS_ALLOWED_ORIGINS',
-    default='http://localhost:5173,http://localhost:3000,http://localhost:8080,http://localhost:8081,http://192.168.1.104:8080,http://192.168.1.104:8081,https://front-pi-nine.vercel.app,https://front-gbhu180nn-bassys-projects-fca17413.vercel.app,https://front-abenkqjdy-bassys-projects-fca17413.vercel.app'
+    default='http://localhost:5173,http://localhost:3000,http://localhost:8080,http://localhost:8081,http://192.168.1.104:8080,http://192.168.1.104:8081,https://front-pi-nine.vercel.app,https://front-gbhu180nn-bassys-projects-fca17413.vercel.app,https://front-abenkqjdy-bassys-projects-fca17413.vercel.app,https://kimmy-beta.vercel.app,https://kimmy-rc25a6oo1-bassys-projects-fca17413.vercel.app'
 )
 
 CORS_ALLOWED_ORIGINS = [
