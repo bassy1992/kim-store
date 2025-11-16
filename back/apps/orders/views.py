@@ -27,7 +27,18 @@ class CartViewSet(viewsets.ViewSet):
             cart, created = Cart.objects.get_or_create(user=request.user)
             print(f"Authenticated user cart: {cart.id}, created: {created}")
         else:
-            # Use session key for guest users
+            # Try to get cart ID from header (client-side tracking)
+            cart_id = request.headers.get('X-Cart-ID')
+            
+            if cart_id:
+                try:
+                    cart = Cart.objects.get(id=int(cart_id), user__isnull=True)
+                    print(f"Found existing cart from header: {cart.id}, items: {cart.items.count()}")
+                    return cart
+                except (Cart.DoesNotExist, ValueError):
+                    print(f"Cart ID {cart_id} not found, creating new cart")
+            
+            # Fallback to session key
             session_key = request.session.session_key
             if not session_key:
                 request.session.create()
@@ -36,12 +47,6 @@ class CartViewSet(viewsets.ViewSet):
             
             # Ensure session is saved to database
             request.session.save()
-            
-            # Get all carts for this session to debug
-            existing_carts = Cart.objects.filter(session_key=session_key)
-            print(f"Existing carts for session {session_key}: {existing_carts.count()}")
-            for c in existing_carts:
-                print(f"  - Cart {c.id}: {c.items.count()} items")
             
             cart, created = Cart.objects.get_or_create(session_key=session_key)
             print(f"Guest cart: {cart.id}, session: {session_key}, created: {created}, items: {cart.items.count()}")
