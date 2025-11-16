@@ -101,14 +101,21 @@ export default function ProductDetails() {
           <div className="mt-6 flex flex-col sm:flex-row gap-3">
             <button
               className="w-full sm:w-auto rounded-md bg-primary px-6 py-3 text-primary-foreground font-medium transform transition-transform hover:-translate-y-0.5 active:translate-y-0.5"
-              onClick={() => add({ 
-                id: id ?? "sku-unknown", 
-                name: productName, 
-                price, 
-                image,
-                productId: id ? parseInt(id) : undefined,
-                size 
-              }, qty)}
+              onClick={() => {
+                const numericId = id ? parseInt(id) : undefined;
+                if (id && isNaN(numericId!)) {
+                  alert('This is a demo product. Please add products from the Shop page.');
+                  return;
+                }
+                add({ 
+                  id: id ?? "sku-unknown", 
+                  name: productName, 
+                  price, 
+                  image,
+                  productId: numericId,
+                  size 
+                }, qty);
+              }}
             >
               Add to cart
             </button>
