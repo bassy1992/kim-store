@@ -33,6 +33,10 @@ class CartViewSet(viewsets.ViewSet):
                 request.session.create()
                 session_key = request.session.session_key
                 print(f"Created new session: {session_key}")
+            
+            # Ensure session is saved to database
+            request.session.save()
+            
             cart, created = Cart.objects.get_or_create(session_key=session_key)
             print(f"Guest cart: {cart.id}, session: {session_key}, created: {created}")
         return cart
@@ -50,6 +54,8 @@ class CartViewSet(viewsets.ViewSet):
         product_id = request.data.get('product_id')
         quantity = int(request.data.get('quantity', 1))
         size = request.data.get('size', '50ml')
+        
+        print(f"Adding item - Cart ID: {cart.id}, Product ID: {product_id}, Quantity: {quantity}")
         
         if not product_id:
             return Response(
@@ -79,7 +85,16 @@ class CartViewSet(viewsets.ViewSet):
             cart_item.quantity += quantity
             cart_item.save()
         
+        print(f"Cart item created: {created}, Cart items count: {cart.items.count()}")
+        
+        # Refresh cart from database to ensure we have latest data
+        cart.refresh_from_db()
+        
+        print(f"After refresh - Cart items count: {cart.items.count()}")
+        
         serializer = CartSerializer(cart, context={'request': request})
+        print(f"Serialized cart data: {serializer.data}")
+        
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
     def update_item(self, request, item_id=None):
