@@ -231,7 +231,7 @@ export default function Index() {
                       style={{animationDelay: `${i * 50}ms`}}
                     >
                       <ProductCard product={{
-                        id: p.slug || String(p.id),
+                        id: String(p.id), // Use numeric ID as string
                         name: p.name,
                         price: parseFloat(p.price),
                         image: p.primary_image || "https://images.unsplash.com/photo-1541643600914-78b084683601?q=80&w=1400&auto=format&fit=crop",
