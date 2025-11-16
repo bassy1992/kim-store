@@ -21,7 +21,8 @@ export default function Success() {
         console.log('Verifying payment with reference:', reference);
         
         // Use Django backend API
-        const response = await fetch(`http://localhost:8000/api/paystack/verify/`, {
+        const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+        const response = await fetch(`${API_BASE_URL}/paystack/verify/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

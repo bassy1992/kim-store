@@ -52,7 +52,8 @@ export default function Checkout() {
       console.log('Initializing Paystack payment with data:', paystackData);
 
       // Use Django backend API
-      const res = await fetch('http://localhost:8000/api/paystack/initialize/', {
+      const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+      const res = await fetch(`${API_BASE_URL}/paystack/initialize/`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",

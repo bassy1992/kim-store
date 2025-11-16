@@ -1,9 +1,9 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
 
-// Use the same CORS proxy configuration as the main API
-const USE_CORS_PROXY = true;
-const RAILWAY_API_URL = import.meta.env.VITE_API_URL || 'https://kim-store-production.up.railway.app/api';
-const CORS_PROXY_URL = '/api'; // Vercel serverless function proxy
+// Direct connection to Railway - CORS is configured on backend
+const USE_CORS_PROXY = false; // Disabled - using direct connection
+const RAILWAY_API_URL = import.meta.env.VITE_API_URL || 'https://web-production-0b12.up.railway.app/api';
+const CORS_PROXY_URL = '/api'; // Vercel serverless function proxy (not used)
 
 const API_BASE_URL = USE_CORS_PROXY ? CORS_PROXY_URL : RAILWAY_API_URL;
 
@@ -54,7 +54,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log('Fetching cart from:', `${API_BASE_URL}/cart/`);
       const response = await fetch(`${API_BASE_URL}/cart/`, {
-        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
       
       console.log('Cart fetch response status:', response.status);
@@ -116,7 +118,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include',
         body: JSON.stringify({
           product_id: productId,
           quantity,
@@ -153,7 +154,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include',
         body: JSON.stringify({ quantity }),
       });
 
@@ -179,7 +179,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await fetch(`${API_BASE_URL}/cart/items/${id}/`, {
         method: 'DELETE',
-        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
 
       if (response.ok) {
@@ -198,7 +200,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await fetch(`${API_BASE_URL}/cart/clear/`, {
         method: 'DELETE',
-        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
 
       if (response.ok) {
@@ -224,7 +228,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include',
         body: JSON.stringify({ code: code.trim().toUpperCase() }),
       });
 
@@ -267,7 +270,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await fetch(`${API_BASE_URL}/cart/remove-promo/`, {
         method: 'POST',
-        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
 
       if (response.ok) {

@@ -34,7 +34,9 @@ export default async function handler(req, res) {
       originalUrl: req.url,
       targetUrl,
       path: targetPath,
-      query: queryString
+      query: queryString,
+      hasBody: !!req.body,
+      bodyType: typeof req.body
     });
     
     // Prepare headers for Railway request
@@ -43,8 +45,8 @@ export default async function handler(req, res) {
       'Accept': 'application/json'
     };
     
-    // Only set Content-Type for requests with body
-    if (req.method !== 'GET' && req.method !== 'HEAD' && req.body) {
+    // Set Content-Type for requests with body
+    if (req.method !== 'GET' && req.method !== 'HEAD') {
       headers['Content-Type'] = 'application/json';
     }
     
@@ -59,9 +61,12 @@ export default async function handler(req, res) {
       headers
     };
     
-    // Add body for POST/PUT requests
-    if (req.method !== 'GET' && req.method !== 'HEAD' && req.body) {
-      fetchOptions.body = JSON.stringify(req.body);
+    // Add body for POST/PUT/PATCH requests
+    if (req.method !== 'GET' && req.method !== 'HEAD' && req.method !== 'OPTIONS') {
+      // Handle request body properly for Vercel
+      if (req.body) {
+        fetchOptions.body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
+      }
     }
     
     const response = await fetch(targetUrl, fetchOptions);
