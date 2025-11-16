@@ -1,66 +1,12 @@
 export default function Reviews() {
-  const reviews = [
-    {
-      name: "Sarah M.",
-      rating: 5,
-      title: "Absolutely stunning fragrance",
-      text: "The Eau de Rose has become my signature scent. It's elegant, long-lasting, and I receive compliments everywhere I go. Worth every penny!",
-      product: "Eau de Rose",
-      verified: true,
-      date: "Oct 28, 2025"
-    },
-    {
-      name: "James K.",
-      rating: 5,
-      title: "Best purchase this year",
-      text: "Citrus Noir is incredibly unique. The blend of citrus and woody notes is perfect for both day and evening wear. Highly recommend!",
-      product: "Citrus Noir",
-      verified: true,
-      date: "Oct 25, 2025"
-    },
-    {
-      name: "Emily R.",
-      rating: 5,
-      title: "Luxurious and long-lasting",
-      text: "I'm obsessed with Amber Oud. The scent is rich, warm, and sophisticated. It lasts all day without being overpowering.",
-      product: "Amber Oud",
-      verified: true,
-      date: "Oct 22, 2025"
-    },
-    {
-      name: "Michael T.",
-      rating: 4,
-      title: "Great quality",
-      text: "Vanilla Bloom is lovely. Sweet but not too sweet, perfect for everyday wear. The packaging is also beautiful!",
-      product: "Vanilla Bloom",
-      verified: true,
-      date: "Oct 20, 2025"
-    },
-    {
-      name: "Lisa P.",
-      rating: 5,
-      title: "My new favorite",
-      text: "The quality is exceptional. These fragrances rival luxury brands at a fraction of the price. Customer service was also excellent!",
-      product: "Eau de Rose",
-      verified: true,
-      date: "Oct 18, 2025"
-    },
-    {
-      name: "David L.",
-      rating: 5,
-      title: "Impressive longevity",
-      text: "I'm amazed by how long these fragrances last. Applied in the morning and still going strong by evening. Will definitely order again!",
-      product: "Citrus Noir",
-      verified: true,
-      date: "Oct 15, 2025"
-    }
-  ];
+  // TODO: Fetch real reviews from API when review system is implemented
+  const reviews: any[] = [];
 
   const stats = [
-    { label: "Average Rating", value: "4.9", icon: "⭐" },
-    { label: "Total Reviews", value: "2,847", icon: "💬" },
-    { label: "Verified Buyers", value: "98%", icon: "✓" },
-    { label: "Would Recommend", value: "96%", icon: "👍" }
+    { label: "Average Rating", value: "5.0", icon: "⭐" },
+    { label: "Total Reviews", value: "0", icon: "💬" },
+    { label: "Verified Buyers", value: "100%", icon: "✓" },
+    { label: "Would Recommend", value: "100%", icon: "👍" }
   ];
 
   return (
@@ -89,8 +35,21 @@ export default function Reviews() {
       </div>
 
       {/* Reviews Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {reviews.map((review, i) => (
+      {reviews.length === 0 ? (
+        <div className="text-center py-16">
+          <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-muted mb-6">
+            <svg className="w-12 h-12 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+            </svg>
+          </div>
+          <h3 className="font-display text-3xl font-bold mb-3">No Reviews Yet</h3>
+          <p className="text-muted-foreground text-lg mb-8">
+            Be the first to share your experience with our fragrances!
+          </p>
+        </div>
+      ) : (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {reviews.map((review, i) => (
           <article 
             key={i}
             className="group relative overflow-hidden rounded-2xl border bg-card p-6 transition-all hover:shadow-xl hover:-translate-y-1 animate-fade-in"
@@ -142,7 +101,8 @@ export default function Reviews() {
             </div>
           </article>
         ))}
-      </div>
+        </div>
+      )}
 
       {/* CTA Section */}
       <div className="mt-16 text-center">

@@ -1,34 +1,6 @@
 export default function Blog() {
-  const posts = [
-    {
-      title: "How to Choose Your Signature Scent",
-      excerpt: "Discover the art of finding a fragrance that truly represents you. Learn about fragrance families, notes, and how to test perfumes properly.",
-      image: "https://images.unsplash.com/photo-1541643600914-78b084683601?q=80&w=800&auto=format&fit=crop",
-      date: "Oct 28, 2025",
-      category: "Guide"
-    },
-    {
-      title: "The Science Behind Fragrance Longevity",
-      excerpt: "Why do some perfumes last all day while others fade quickly? Explore the chemistry and techniques for making your scent last longer.",
-      image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=800&auto=format&fit=crop",
-      date: "Oct 25, 2025",
-      category: "Education"
-    },
-    {
-      title: "New Season Collection Launch",
-      excerpt: "Introducing our latest collection inspired by autumn landscapes. Three new fragrances that capture the essence of the season.",
-      image: "https://images.unsplash.com/photo-1563170351-be82bc888aa4?q=80&w=800&auto=format&fit=crop",
-      date: "Oct 20, 2025",
-      category: "News"
-    },
-    {
-      title: "Layering Fragrances Like a Pro",
-      excerpt: "Master the art of fragrance layering to create a unique scent profile. Tips and combinations that work beautifully together.",
-      image: "https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=800&auto=format&fit=crop",
-      date: "Oct 15, 2025",
-      category: "Tips"
-    }
-  ];
+  // TODO: Fetch real blog posts from API when blog system is implemented
+  const posts: any[] = [];
 
   return (
     <main className="container py-16 animate-fade-in">
@@ -40,14 +12,27 @@ export default function Blog() {
         </p>
       </div>
 
-      {/* Featured Post */}
-      <article className="group relative overflow-hidden rounded-3xl border bg-card mb-12 animate-scale-in">
-        <div className="grid md:grid-cols-2 gap-0">
-          <div className="relative aspect-[4/3] md:aspect-auto overflow-hidden">
-            <img 
-              src={posts[0].image} 
-              alt={posts[0].title}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+      {/* Empty State or Featured Post */}
+      {posts.length === 0 ? (
+        <div className="text-center py-16 mb-12">
+          <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-muted mb-6">
+            <svg className="w-12 h-12 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+            </svg>
+          </div>
+          <h3 className="font-display text-3xl font-bold mb-3">Coming Soon</h3>
+          <p className="text-muted-foreground text-lg mb-8">
+            We're working on exciting content about fragrances, tips, and more. Check back soon!
+          </p>
+        </div>
+      ) : (
+        <article className="group relative overflow-hidden rounded-3xl border bg-card mb-12 animate-scale-in">
+          <div className="grid md:grid-cols-2 gap-0">
+            <div className="relative aspect-[4/3] md:aspect-auto overflow-hidden">
+              <img 
+                src={posts[0].image} 
+                alt={posts[0].title}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
             />
             <div className="absolute top-4 left-4">
               <span className="inline-block px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-medium">
@@ -76,10 +61,12 @@ export default function Blog() {
           </div>
         </div>
       </article>
+      )}
 
       {/* Blog Grid */}
-      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        {posts.slice(1).map((post, i) => (
+      {posts.length > 1 && (
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {posts.slice(1).map((post, i) => (
           <article 
             key={post.title}
             className="group cursor-pointer animate-fade-in"
@@ -106,7 +93,8 @@ export default function Blog() {
             </p>
           </article>
         ))}
-      </div>
+        </div>
+      )}
 
       {/* Newsletter CTA */}
       <div className="mt-16 relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/10 via-accent/10 to-secondary p-12 text-center">
