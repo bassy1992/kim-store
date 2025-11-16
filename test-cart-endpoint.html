@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Cart Endpoint</title>
+</head>
+<body>
+    <h1>Testing Cart Endpoint</h1>
+    <div id="results"></div>
+    
+    <script>
+        async function testCartEndpoint() {
+            const results = document.getElementById('results');
+            const railwayUrl = 'https://web-production-0b12.up.railway.app';
+            
+            try {
+                // Test 1: Get cart
+                console.log('1. Testing GET /api/cart/');
+                const getResponse = await fetch(`${railwayUrl}/api/cart/`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                console.log('GET Response:', getResponse.status);
+                const getResult = await getResponse.json();
+                console.log('GET Data:', getResult);
+                
+                // Test 2: Add to cart
+                console.log('2. Testing POST /api/cart/items/');
+                const postResponse = await fetch(`${railwayUrl}/api/cart/items/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        product_id: 1,
+                        quantity: 1,
+                        size: '50ml'
+                    })
+                });
+                
+                console.log('POST Response:', postResponse.status);
+                const postResult = await postResponse.json();
+                console.log('POST Data:', postResult);
+                
+                results.innerHTML = `
+                    <h2>✅ Cart Endpoint Test</h2>
+                    <p><strong>GET /api/cart/:</strong> ${getResponse.status}</p>
+                    <p><strong>POST /api/cart/items/:</strong> ${postResponse.status}</p>
+                    <p><strong>GET Result:</strong> ${JSON.stringify(getResult, null, 2)}</p>
+                    <p><strong>POST Result:</strong> ${JSON.stringify(postResult, null, 2)}</p>
+                `;
+                
+            } catch (error) {
+                console.error('Test failed:', error);
+                results.innerHTML = `
+                    <h2>❌ Test Failed</h2>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                `;
+            }
+        }
+        
+        testCartEndpoint();
+    </script>
+</body>
+</html>

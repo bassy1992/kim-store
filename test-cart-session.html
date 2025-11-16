@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Cart Session</title>
+</head>
+<body>
+    <h1>Test Cart Session Tracking</h1>
+    <div id="results"></div>
+    
+    <script>
+        async function testCartSession() {
+            const results = document.getElementById('results');
+            const railwayUrl = 'https://web-production-0b12.up.railway.app';
+            let html = '<h2>Cart Session Test</h2>';
+            
+            try {
+                // Step 1: Get initial cart
+                console.log('Step 1: Get initial cart');
+                const getCart1 = await fetch(`${railwayUrl}/api/cart/`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const cart1 = await getCart1.json();
+                const cartId1 = getCart1.headers.get('X-Cart-ID');
+                console.log('Initial cart ID:', cartId1, 'Items:', cart1.items?.length);
+                html += `<p><strong>Initial Cart ID:</strong> ${cartId1}</p>`;
+                html += `<p><strong>Initial Items:</strong> ${cart1.items?.length || 0}</p>`;
+                
+                // Step 2: Add item
+                console.log('Step 2: Add item');
+                const addResponse = await fetch(`${railwayUrl}/api/cart/items/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        product_id: 1,
+                        quantity: 1,
+                        size: '50ml'
+                    })
+                });
+                const addResult = await addResponse.json();
+                const cartId2 = addResponse.headers.get('X-Cart-ID');
+                console.log('After add Cart ID:', cartId2, 'Items:', addResult.items?.length);
+                html += `<p><strong>After Add Cart ID:</strong> ${cartId2}</p>`;
+                html += `<p><strong>After Add Items:</strong> ${addResult.items?.length || 0}</p>`;
+                
+                // Step 3: Get cart again
+                console.log('Step 3: Get cart again');
+                const getCart2 = await fetch(`${railwayUrl}/api/cart/`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const cart2 = await getCart2.json();
+                const cartId3 = getCart2.headers.get('X-Cart-ID');
+                console.log('Final cart ID:', cartId3, 'Items:', cart2.items?.length);
+                html += `<p><strong>Final Cart ID:</strong> ${cartId3}</p>`;
+                html += `<p><strong>Final Items:</strong> ${cart2.items?.length || 0}</p>`;
+                
+                // Check if cart IDs match
+                if (cartId1 === cartId2 && cartId2 === cartId3) {
+                    html += `<p style="color: green;"><strong>✅ Same cart ID throughout</strong></p>`;
+                } else {
+                    html += `<p style="color: red;"><strong>❌ Different cart IDs!</strong></p>`;
+                }
+                
+                results.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                results.innerHTML = `<h2>❌ Error</h2><p>${error.message}</p>`;
+            }
+        }
+        
+        testCartSession();
+    </script>
+</body>
+</html>

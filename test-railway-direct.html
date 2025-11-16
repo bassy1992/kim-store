@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Railway Direct</title>
+</head>
+<body>
+    <h1>Testing Railway Backend Direct</h1>
+    <div id="results"></div>
+    
+    <script>
+        async function testRailwayDirect() {
+            const results = document.getElementById('results');
+            const railwayUrl = 'https://web-production-0b12.up.railway.app';
+            
+            try {
+                // Test GET products
+                console.log('Testing GET products...');
+                const getResponse = await fetch(`${railwayUrl}/api/products/`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                    }
+                });
+                
+                console.log('GET Response:', getResponse.status);
+                const getResult = await getResponse.json();
+                console.log('GET Data:', getResult);
+                
+                // Test POST to cart (this might fail due to CORS, but we can see the error)
+                console.log('Testing POST cart...');
+                try {
+                    const postResponse = await fetch(`${railwayUrl}/api/cart/items/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            product_id: 1,
+                            quantity: 1,
+                            size: '50ml'
+                        })
+                    });
+                    
+                    console.log('POST Response:', postResponse.status);
+                    const postResult = await postResponse.json();
+                    console.log('POST Data:', postResult);
+                    
+                    results.innerHTML = `
+                        <h2>✅ Railway Direct Test</h2>
+                        <p><strong>GET Status:</strong> ${getResponse.status}</p>
+                        <p><strong>Products:</strong> ${getResult.results?.length || 0}</p>
+                        <p><strong>POST Status:</strong> ${postResponse.status}</p>
+                        <p><strong>POST Works:</strong> ${postResponse.ok ? 'Yes' : 'No'}</p>
+                    `;
+                    
+                } catch (corsError) {
+                    console.log('POST failed (likely CORS):', corsError);
+                    results.innerHTML = `
+                        <h2>⚠️ Railway Direct Test</h2>
+                        <p><strong>GET Status:</strong> ${getResponse.status}</p>
+                        <p><strong>Products:</strong> ${getResult.results?.length || 0}</p>
+                        <p><strong>POST:</strong> CORS blocked (expected)</p>
+                        <p><strong>Backend:</strong> Working ✅</p>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('Test failed:', error);
+                results.innerHTML = `
+                    <h2>❌ Railway Test Failed</h2>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                `;
+            }
+        }
+        
+        testRailwayDirect();
+    </script>
+</body>
+</html>

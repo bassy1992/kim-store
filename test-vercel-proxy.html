@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Vercel Proxy</title>
+</head>
+<body>
+    <h1>Testing Vercel API Proxy</h1>
+    <div id="results"></div>
+    
+    <script>
+        async function testProxy() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Testing proxy...</p>';
+            
+            try {
+                // Test GET request
+                console.log('Testing GET /api/products/');
+                const getResponse = await fetch('/api/products/');
+                console.log('GET Response status:', getResponse.status);
+                
+                if (getResponse.ok) {
+                    const getData = await getResponse.json();
+                    console.log('GET Response data:', getData);
+                    
+                    // Test POST request to cart
+                    console.log('Testing POST /api/cart/items/');
+                    const postResponse = await fetch('/api/cart/items/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            product_id: 1,
+                            quantity: 1,
+                            size: '50ml'
+                        })
+                    });
+                    
+                    console.log('POST Response status:', postResponse.status);
+                    const postData = await postResponse.json();
+                    console.log('POST Response data:', postData);
+                    
+                    results.innerHTML = `
+                        <h2>✅ Proxy Test Results</h2>
+                        <p><strong>GET Status:</strong> ${getResponse.status}</p>
+                        <p><strong>Products Found:</strong> ${getData.results?.length || 0}</p>
+                        <p><strong>POST Status:</strong> ${postResponse.status}</p>
+                        <p><strong>POST Success:</strong> ${postResponse.ok ? 'Yes' : 'No'}</p>
+                    `;
+                } else {
+                    results.innerHTML = `
+                        <h2>❌ GET Request Failed</h2>
+                        <p><strong>Status:</strong> ${getResponse.status}</p>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('Proxy test failed:', error);
+                results.innerHTML = `
+                    <h2>❌ Proxy Test Failed</h2>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                `;
+            }
+        }
+        
+        // Run test when page loads
+        testProxy();
+    </script>
+</body>
+</html>

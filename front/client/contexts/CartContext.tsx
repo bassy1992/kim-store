@@ -52,14 +52,29 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   // Fetch cart from Django backend
   const refreshCart = useCallback(async () => {
     try {
-      console.log('Fetching cart from:', `${API_BASE_URL}/cart/`);
+      // Get cart ID from localStorage
+      const cartId = localStorage.getItem('cartId');
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      
+      if (cartId) {
+        headers['X-Cart-ID'] = cartId;
+      }
+      
+      console.log('Fetching cart from:', `${API_BASE_URL}/cart/`, 'with cart ID:', cartId);
       const response = await fetch(`${API_BASE_URL}/cart/`, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
       });
       
       console.log('Cart fetch response status:', response.status);
+      
+      // Store cart ID from response
+      const responseCartId = response.headers.get('X-Cart-ID');
+      if (responseCartId) {
+        localStorage.setItem('cartId', responseCartId);
+        console.log('Stored cart ID:', responseCartId);
+      }
       
       if (response.ok) {
         const data = await response.json();
@@ -113,17 +128,32 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
       console.log('Adding to cart:', { productId, item, quantity });
 
+      // Get cart ID from localStorage
+      const cartId = localStorage.getItem('cartId');
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      
+      if (cartId) {
+        headers['X-Cart-ID'] = cartId;
+      }
+
       const response = await fetch(`${API_BASE_URL}/cart/items/`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify({
           product_id: productId,
           quantity,
           size: item.size || '50ml',
         }),
       });
+      
+      // Store cart ID from response
+      const responseCartId = response.headers.get('X-Cart-ID');
+      if (responseCartId) {
+        localStorage.setItem('cartId', responseCartId);
+        console.log('Stored cart ID after add:', responseCartId);
+      }
 
       if (response.ok) {
         console.log('✅ Successfully added to cart');
