@@ -284,6 +284,7 @@ CORS_PREFLIGHT_MAX_AGE = 86400  # 24 hours
 CORS_EXPOSE_HEADERS = [
     'content-type',
     'x-csrftoken',
+    'x-cart-id',
 ]
 
 # drf-spectacular settings
