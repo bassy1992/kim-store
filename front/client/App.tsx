@@ -28,7 +28,15 @@ import PerfumeOils from "./pages/PerfumeOils";
 import AirAmbience from "./pages/AirAmbience";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1, // Only retry once instead of 3 times
+      refetchOnWindowFocus: false, // Don't refetch when window regains focus
+      staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
+    },
+  },
+});
 
 import Header from "@/components/site/Header";
 import Footer from "@/components/site/Footer";
