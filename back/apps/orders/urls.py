@@ -9,8 +9,13 @@ router.register(r'orders', OrderViewSet, basename='order')
 
 urlpatterns = [
     path('', include(router.urls)),
-    # Explicit cart item URLs to handle trailing slashes
+    
+    # Explicit cart endpoints
+    path('cart/items/', CartViewSet.as_view({'post': 'add_item'}), name='cart-items-add'),
     path('cart/items/<int:item_id>/', CartViewSet.as_view({'patch': 'update_item', 'delete': 'remove_item'}), name='cart-item-detail'),
+    path('cart/clear/', CartViewSet.as_view({'delete': 'clear_cart'}), name='cart-clear'),
+    path('cart/apply-promo/', CartViewSet.as_view({'post': 'apply_promo_code'}), name='cart-apply-promo'),
+    path('cart/remove-promo/', CartViewSet.as_view({'post': 'remove_promo_code'}), name='cart-remove-promo'),
     
     # Paystack payment endpoints
     path('paystack/initialize/', initialize_payment, name='paystack-initialize'),
