@@ -265,6 +265,7 @@ CORS_ALLOW_HEADERS = [
     'user-agent',
     'x-csrftoken',
     'x-requested-with',
+    'x-cart-id',
     'cache-control',
     'pragma',
     'expires',
