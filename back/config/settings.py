@@ -91,8 +91,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'config.cors_middleware.CustomCorsMiddleware',  # Custom CORS as backup
-    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # Django-CORS-Headers (must be first)
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # Serve static files
     'django.contrib.sessions.middleware.SessionMiddleware',
