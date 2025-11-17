@@ -240,9 +240,11 @@ export default function AirAmbience() {
                     {/* Large Content */}
                     <div className="p-4 space-y-3">
                       <div>
-                        <h3 className="font-semibold text-base leading-tight line-clamp-2 group-hover:text-primary transition-colors">
-                          {product.name}
-                        </h3>
+                        <a href={`/air-ambience/${product.slug}`} className="block">
+                          <h3 className="font-semibold text-base leading-tight line-clamp-2 group-hover:text-primary transition-colors">
+                            {product.name}
+                          </h3>
+                        </a>
                         <p className="text-sm text-muted-foreground mt-1 capitalize">{product.product_type.replace('_', ' ')}</p>
                       </div>
                       
