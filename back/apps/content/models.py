@@ -190,6 +190,16 @@ class DupeProduct(models.Model):
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     
+    # Link to actual product in inventory (for cart/orders)
+    product = models.OneToOneField(
+        'products.Product',
+        on_delete=models.CASCADE,
+        related_name='dupe_info',
+        null=True,
+        blank=True,
+        help_text='Link to the actual product in inventory'
+    )
+    
     # Original designer fragrance info
     designer_brand = models.CharField(max_length=100, help_text="e.g., Chanel, Dior")
     designer_fragrance = models.CharField(max_length=200, help_text="e.g., Coco Mademoiselle")

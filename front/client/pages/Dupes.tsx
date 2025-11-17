@@ -20,6 +20,7 @@ interface DupeProduct {
   is_featured: boolean;
   savings: number;
   savings_percentage: number;
+  product_id?: number;  // Linked product ID for cart
 }
 
 interface Category {
@@ -89,12 +90,24 @@ export default function Dupes() {
   const handleAddToCart = async (product: DupeProduct) => {
     setAddingToCart(product.id);
     try {
+      // Check if product has a linked product_id
+      if (!product.product_id) {
+        toast({
+          title: "Product not available",
+          description: "This dupe is not yet available for purchase.",
+          variant: "destructive",
+          duration: 3000,
+        });
+        setAddingToCart(null);
+        return;
+      }
+      
       await addToCart({
-        id: product.id.toString(),
+        id: product.slug,
         name: product.name,
         price: parseFloat(product.price),
         image: product.image || '/placeholder.jpg',
-        productId: product.id,
+        productId: product.product_id,  // Use the linked product ID
         size: '50ml'
       });
       
