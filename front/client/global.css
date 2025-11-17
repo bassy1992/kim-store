@@ -96,6 +96,10 @@
     @apply border-border;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   html, body {
     @apply bg-background text-foreground;
     font-family: theme(fontFamily.sans);

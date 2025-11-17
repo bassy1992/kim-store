@@ -43,6 +43,7 @@ const queryClient = new QueryClient({
 import Header from "@/components/site/Header";
 import Footer from "@/components/site/Footer";
 import { CartProvider } from "@/contexts/CartContext";
+import ScrollToTop from "@/components/ScrollToTop";
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -50,6 +51,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <ScrollToTop />
         <CartProvider>
           <Header />
           <Routes>
