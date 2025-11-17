@@ -69,7 +69,6 @@ class CartViewSet(viewsets.ViewSet):
         """Alias for add_item to support POST to /cart/ endpoint"""
         return self.add_item(request)
     
-    @action(detail=False, methods=['post'], url_path='items')
     def add_item(self, request):
         """Add item to cart - supports both Product and DupeProduct"""
         from django.contrib.contenttypes.models import ContentType
