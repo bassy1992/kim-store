@@ -51,7 +51,7 @@ export default function Shop() {
   });
 
   const products = productsData?.results || [];
-  const categories = ["All", ...(Array.isArray(categoriesData) ? categoriesData.map(c => c.name) : ["Floral", "Woody", "Citrus", "Oriental"])];
+  const categories = ["All", ...(Array.isArray(categoriesData) ? categoriesData.map(c => c.name) : [])];
   
   const sortOptions = [
     { value: "featured", label: "Featured" },
@@ -243,12 +243,12 @@ export default function Shop() {
                 style={{animationDelay: `${i * 50}ms`}}
               >
                 <ProductCard product={{
-                  id: String(p.id),
+                  id: p.slug, // Use slug for URL routing
                   name: p.name,
                   price: parseFloat(p.price),
                   image: p.primary_image || "https://images.unsplash.com/photo-1541643600914-78b084683601?q=80&w=1400&auto=format&fit=crop",
                   tag: p.tag,
-                  productId: p.id, // Pass the original numeric ID
+                  productId: p.id, // Pass the original numeric ID for cart
                 }} />
               </div>
             ))}

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/site/ProductCard";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { productsApi } from "@/lib/api";
+import { productsApi, categoriesApi } from "@/lib/api";
 
 const logoUrl =
   "https://cdn.builder.io/api/v1/image/assets%2F261a98e6df434ad1ad15c1896e5c6aa3%2Fdf532e50700b467496efcdf88eec7598?format=webp&width=800";
@@ -45,6 +45,19 @@ const testimonials = [
 export default function Index() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+
+  // Fetch categories from API
+  const { data: categoriesData, isLoading: categoriesLoading, error: categoriesError } = useQuery({
+    queryKey: ['categories'],
+    queryFn: categoriesApi.list,
+  });
+
+  // Debug logging
+  useEffect(() => {
+    console.log('Categories Data:', categoriesData);
+    console.log('Categories Loading:', categoriesLoading);
+    console.log('Categories Error:', categoriesError);
+  }, [categoriesData, categoriesLoading, categoriesError]);
 
   // Fetch featured products from API
   const { data: productsData } = useQuery({
@@ -231,12 +244,12 @@ export default function Index() {
                       style={{animationDelay: `${i * 50}ms`}}
                     >
                       <ProductCard product={{
-                        id: String(p.id), // Use numeric ID as string
+                        id: p.slug, // Use slug for URL routing
                         name: p.name,
                         price: parseFloat(p.price),
                         image: p.primary_image || "https://images.unsplash.com/photo-1541643600914-78b084683601?q=80&w=1400&auto=format&fit=crop",
                         tag: p.tag,
-                        productId: p.id, // Pass the original numeric ID
+                        productId: p.id, // Pass the original numeric ID for cart
                       }} />
                     </div>
                   ))}
@@ -303,30 +316,58 @@ export default function Index() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { name: "Floral", image: "https://images.unsplash.com/photo-1490750967868-88aa4486c946?q=80&w=800&auto=format&fit=crop", desc: "Romantic & Elegant" },
-              { name: "Woody", image: "https://images.unsplash.com/photo-1615529182904-14819c35db37?q=80&w=800&auto=format&fit=crop", desc: "Warm & Sophisticated" },
-              { name: "Citrus", image: "https://images.unsplash.com/photo-1582979512210-99b6a53386f9?q=80&w=800&auto=format&fit=crop", desc: "Fresh & Energizing" },
-              { name: "Oriental", image: "https://images.unsplash.com/photo-1602874801006-e04b6d0c5d85?q=80&w=800&auto=format&fit=crop", desc: "Exotic & Mysterious" }
-            ].map((category, i) => (
-              <Link
-                key={i}
-                to={`/shop?category=${category.name.toLowerCase()}`}
-                className="group relative overflow-hidden rounded-2xl aspect-[3/4] animate-fade-in hover:scale-105 transition-transform duration-300"
-                style={{animationDelay: `${i * 100}ms`}}
-              >
-                <img
-                  src={category.image}
-                  alt={category.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            {categoriesError ? (
+              <div className="col-span-full text-center py-8 text-destructive">
+                Error loading categories: {categoriesError.message}
+              </div>
+            ) : categoriesData && categoriesData.length > 0 ? (
+              categoriesData.map((category, i) => {
+                // Map category images based on category name
+                const categoryImages: Record<string, string> = {
+                  'floral': "https://images.unsplash.com/photo-1490750967868-88aa4486c946?q=80&w=800&auto=format&fit=crop",
+                  'woody': "https://images.unsplash.com/photo-1615529182904-14819c35db37?q=80&w=800&auto=format&fit=crop",
+                  'citrus': "https://images.unsplash.com/photo-1582979512210-99b6a53386f9?q=80&w=800&auto=format&fit=crop",
+                  'oriental': "https://images.unsplash.com/photo-1602874801006-e04b6d0c5d85?q=80&w=800&auto=format&fit=crop",
+                  'fresh': "https://images.unsplash.com/photo-1588405748880-12d1d2a59d75?q=80&w=800&auto=format&fit=crop",
+                  'spicy': "https://images.unsplash.com/photo-1596040033229-a0b3b7d1f4b8?q=80&w=800&auto=format&fit=crop",
+                  'perfumes': "https://images.unsplash.com/photo-1541643600914-78b084683601?q=80&w=800&auto=format&fit=crop",
+                  'perfume oils': "https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=800&auto=format&fit=crop",
+                  'air ambience': "https://images.unsplash.com/photo-1602874801006-e04b6d0c5d85?q=80&w=800&auto=format&fit=crop",
+                };
+                
+                const defaultImage = "https://images.unsplash.com/photo-1541643600914-78b084683601?q=80&w=800&auto=format&fit=crop";
+                const categoryImage = categoryImages[category.name.toLowerCase()] || defaultImage;
+                
+                return (
+                  <Link
+                    key={category.id}
+                    to={`/shop?category=${category.slug}`}
+                    className="group relative overflow-hidden rounded-2xl aspect-[3/4] animate-fade-in hover:scale-105 transition-transform duration-300"
+                    style={{animationDelay: `${i * 100}ms`}}
+                  >
+                    <img
+                      src={categoryImage}
+                      alt={category.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                      <h3 className="font-display text-2xl font-bold mb-1">{category.name}</h3>
+                      <p className="text-white/80 text-sm">{category.description || 'Explore our collection'}</p>
+                    </div>
+                  </Link>
+                );
+              })
+            ) : (
+              // Loading skeleton
+              Array.from({ length: 4 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="relative overflow-hidden rounded-2xl aspect-[3/4] bg-muted animate-pulse"
+                  style={{animationDelay: `${i * 100}ms`}}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                  <h3 className="font-display text-2xl font-bold mb-1">{category.name}</h3>
-                  <p className="text-white/80 text-sm">{category.desc}</p>
-                </div>
-              </Link>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </section>

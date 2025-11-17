@@ -22,6 +22,7 @@ export type CartItem = {
   productId?: number;
   dupeId?: number;
   size?: string;
+  slug?: string; // Product slug for routing
 };
 
 type CartContextType = {
@@ -89,6 +90,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           image: item.product.primary_image || '/placeholder.jpg',
           quantity: item.quantity,
           productId: item.product.id,
+          slug: item.product.slug, // Add slug for routing
           size: item.size,
         }));
         
@@ -310,6 +312,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           image: item.product.primary_image || '/placeholder.jpg',
           quantity: item.quantity,
           productId: item.product.id,
+          slug: item.product.slug, // Add slug for routing
           size: item.size,
         }));
         

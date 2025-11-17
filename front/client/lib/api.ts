@@ -225,7 +225,10 @@ export const productsApi = {
 
 // Categories API
 export const categoriesApi = {
-  list: () => apiFetch<Category[]>('/categories/'),
+  list: async () => {
+    const response = await apiFetch<{ results: Category[]; count: number; next: string | null; previous: string | null }>('/categories/');
+    return response.results; // Return just the results array
+  },
   get: (slug: string) => apiFetch<Category>(`/categories/${slug}/`),
 };
 

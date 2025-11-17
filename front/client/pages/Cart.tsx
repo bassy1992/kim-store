@@ -66,7 +66,7 @@ export default function Cart() {
                 >
                   <div className="flex gap-4 md:gap-6">
                     {/* Product Image */}
-                    <Link to={`/product/${item.id}`} className="flex-shrink-0">
+                    <Link to={`/product/${item.slug || item.productId}`} className="flex-shrink-0">
                       <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-xl overflow-hidden bg-muted">
                         <img 
                           src={item.image} 
@@ -80,7 +80,7 @@ export default function Cart() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
-                          <Link to={`/product/${item.id}`} className="group/link">
+                          <Link to={`/product/${item.slug || item.productId}`} className="group/link">
                             <h3 className="font-display text-lg md:text-xl font-semibold group-hover/link:text-primary transition-colors line-clamp-2">
                               {item.name}
                             </h3>
