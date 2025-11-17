@@ -167,10 +167,13 @@ class CartViewSet(viewsets.ViewSet):
         if quantity <= 0:
             cart_item.delete()
         else:
+            # Get the actual product object (supports Product, DupeProduct, AirAmbience, PerfumeOil)
+            product_obj = cart_item.get_product()
+            
             # Check stock availability
-            if cart_item.product.stock_quantity < quantity:
+            if product_obj and product_obj.stock_quantity < quantity:
                 return Response(
-                    {'error': f'Insufficient stock. Available: {cart_item.product.stock_quantity}'},
+                    {'error': f'Insufficient stock. Available: {product_obj.stock_quantity}'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             cart_item.quantity = quantity

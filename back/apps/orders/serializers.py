@@ -136,10 +136,12 @@ class OrderCreateSerializer(serializers.Serializer):
         
         # Validate stock availability
         for item in cart.items.all():
-            if item.product.stock_quantity < item.quantity:
+            product_obj = item.get_product()
+            if product_obj and product_obj.stock_quantity < item.quantity:
+                product_name = product_obj.name if hasattr(product_obj, 'name') else item.product_name
                 raise serializers.ValidationError(
-                    f"Insufficient stock for {item.product.name}. "
-                    f"Available: {item.product.stock_quantity}, Requested: {item.quantity}"
+                    f"Insufficient stock for {product_name}. "
+                    f"Available: {product_obj.stock_quantity}, Requested: {item.quantity}"
                 )
         
         return data
@@ -171,18 +173,22 @@ class OrderCreateSerializer(serializers.Serializer):
         
         # Create order items and reduce stock
         for cart_item in cart.items.all():
+            # Get the actual product object (supports all product types)
+            product_obj = cart_item.get_product()
+            
             OrderItem.objects.create(
                 order=order,
-                product=cart_item.product,
-                product_name=cart_item.product.name,
-                product_price=cart_item.product.price,
+                product=cart_item.product if cart_item.product else None,
+                product_name=cart_item.product_name or (product_obj.name if product_obj else 'Unknown'),
+                product_price=cart_item.product_price or (product_obj.price if product_obj else 0),
                 quantity=cart_item.quantity,
                 size=cart_item.size
             )
             
             # Reduce stock quantity
-            cart_item.product.stock_quantity -= cart_item.quantity
-            cart_item.product.save()
+            if product_obj:
+                product_obj.stock_quantity -= cart_item.quantity
+                product_obj.save()
         
         # Apply promo code usage if used
         if cart.promo_code:
