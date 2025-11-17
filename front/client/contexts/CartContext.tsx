@@ -13,6 +13,16 @@ console.log('🛒 Cart API Configuration:', {
   environment: import.meta.env.MODE
 });
 
+// Developer utility: Add to window for easy cart debugging
+if (typeof window !== 'undefined') {
+  (window as any).clearCartData = () => {
+    localStorage.removeItem('cartId');
+    sessionStorage.removeItem('cartId');
+    console.log('✅ Cart data cleared! Refresh the page to see changes.');
+  };
+  console.log('💡 Dev tip: Run window.clearCartData() to clear cart storage');
+}
+
 export type CartItem = {
   id: string;
   name: string;
@@ -100,6 +110,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         setDiscountAmount(parseFloat(data.discount_amount || 0));
         setTotal(parseFloat(data.total || 0));
         console.log('Cart updated with items:', transformedItems.length);
+      } else if (response.status === 404) {
+        // Cart not found - clear localStorage and reset state
+        console.warn('Cart not found, clearing localStorage');
+        localStorage.removeItem('cartId');
+        setItems([]);
+        setPromoCode(undefined);
+        setSubtotal(0);
+        setDiscountAmount(0);
+        setTotal(0);
       } else {
         console.error('Failed to fetch cart, status:', response.status);
       }
@@ -351,6 +370,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (!response.ok) {
         // If failed, refresh to get actual state
         await refreshCart();
+      } else {
+        // Clear localStorage cart ID when cart is cleared
+        localStorage.removeItem('cartId');
       }
     } catch (error) {
       console.error('Failed to clear cart:', error);
