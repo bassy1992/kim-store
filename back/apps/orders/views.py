@@ -70,65 +70,70 @@ class CartViewSet(viewsets.ViewSet):
         return self.add_item(request)
     
     def add_item(self, request):
-        """Add item to cart - supports both Product and DupeProduct"""
+        """Add item to cart - supports Product, DupeProduct, AirAmbience, and PerfumeOil"""
         from django.contrib.contenttypes.models import ContentType
-        from apps.content.models import DupeProduct
+        from apps.content.models import DupeProduct, AirAmbience, PerfumeOil
         
         cart = self.get_cart(request)
         product_id = request.data.get('product_id')
         dupe_id = request.data.get('dupe_id')
+        air_ambience_id = request.data.get('air_ambience_id')
+        perfume_oil_id = request.data.get('perfume_oil_id')
         quantity = int(request.data.get('quantity', 1))
         size = request.data.get('size', '50ml')
         
-        print(f"Adding item - Cart ID: {cart.id}, Product ID: {product_id}, Dupe ID: {dupe_id}, Quantity: {quantity}")
-        
-        if not product_id and not dupe_id:
-            return Response(
-                {'error': 'Either product_id or dupe_id is required'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        print(f"Adding item - Cart ID: {cart.id}, Product ID: {product_id}, Dupe ID: {dupe_id}, AirAmbience ID: {air_ambience_id}, PerfumeOil ID: {perfume_oil_id}, Quantity: {quantity}")
         
         # Determine which type of product we're adding
-        if dupe_id:
+        item_obj = None
+        content_type = None
+        object_id = None
+        
+        if air_ambience_id:
+            # Adding an AirAmbience product
+            item_obj = get_object_or_404(AirAmbience, id=air_ambience_id)
+            content_type = ContentType.objects.get_for_model(AirAmbience)
+            object_id = air_ambience_id
+        elif perfume_oil_id:
+            # Adding a PerfumeOil product
+            item_obj = get_object_or_404(PerfumeOil, id=perfume_oil_id)
+            content_type = ContentType.objects.get_for_model(PerfumeOil)
+            object_id = perfume_oil_id
+        elif dupe_id:
             # Adding a DupeProduct
             item_obj = get_object_or_404(DupeProduct, id=dupe_id)
             content_type = ContentType.objects.get_for_model(DupeProduct)
-            
-            # Check stock availability
-            if item_obj.stock_quantity < quantity:
-                return Response(
-                    {'error': f'Insufficient stock. Available: {item_obj.stock_quantity}'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            
-            # Get or create cart item for dupe
-            cart_item, created = CartItem.objects.get_or_create(
-                cart=cart,
-                content_type=content_type,
-                object_id=dupe_id,
-                size=size,
-                defaults={'quantity': quantity}
-            )
-        else:
+            object_id = dupe_id
+        elif product_id:
             # Adding a regular Product
             item_obj = get_object_or_404(Product, id=product_id)
             content_type = ContentType.objects.get_for_model(Product)
-            
-            # Check stock availability
-            if item_obj.stock_quantity < quantity:
-                return Response(
-                    {'error': f'Insufficient stock. Available: {item_obj.stock_quantity}'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            
-            # Get or create cart item for product
-            cart_item, created = CartItem.objects.get_or_create(
-                cart=cart,
-                content_type=content_type,
-                object_id=product_id,
-                size=size,
-                defaults={'quantity': quantity, 'product': item_obj}  # Keep legacy field for compatibility
+            object_id = product_id
+        else:
+            return Response(
+                {'error': 'Product ID is required (product_id, dupe_id, air_ambience_id, or perfume_oil_id)'},
+                status=status.HTTP_400_BAD_REQUEST
             )
+        
+        # Check stock availability
+        if item_obj.stock_quantity < quantity:
+            return Response(
+                {'error': f'Insufficient stock. Available: {item_obj.stock_quantity}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Get or create cart item
+        defaults = {'quantity': quantity}
+        if product_id:
+            defaults['product'] = item_obj  # Keep legacy field for Product compatibility
+        
+        cart_item, created = CartItem.objects.get_or_create(
+            cart=cart,
+            content_type=content_type,
+            object_id=object_id,
+            size=size,
+            defaults=defaults
+        )
         
         if not created:
             # Update quantity if item already exists

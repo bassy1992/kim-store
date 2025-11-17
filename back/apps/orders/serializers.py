@@ -4,25 +4,35 @@ from apps.products.serializers import ProductListSerializer
 
 
 class CartItemSerializer(serializers.ModelSerializer):
-    """Serializer for cart items with product details - supports Product and DupeProduct"""
+    """Serializer for cart items with product details - supports Product, DupeProduct, AirAmbience, and PerfumeOil"""
     product = serializers.SerializerMethodField()
     product_id = serializers.IntegerField(write_only=True, required=False)
     dupe_id = serializers.IntegerField(write_only=True, required=False)
+    air_ambience_id = serializers.IntegerField(write_only=True, required=False)
+    perfume_oil_id = serializers.IntegerField(write_only=True, required=False)
     subtotal = serializers.SerializerMethodField()
     
     class Meta:
         model = CartItem
-        fields = ['id', 'product', 'product_id', 'dupe_id', 'quantity', 'size', 'subtotal']
+        fields = ['id', 'product', 'product_id', 'dupe_id', 'air_ambience_id', 'perfume_oil_id', 'quantity', 'size', 'subtotal']
     
     def get_product(self, obj):
-        """Get product details from either Product or DupeProduct"""
-        from apps.content.models import DupeProduct
-        from apps.content.serializers import DupeProductListSerializer
+        """Get product details from Product, DupeProduct, AirAmbience, or PerfumeOil"""
+        from apps.content.models import DupeProduct, AirAmbience, PerfumeOil
+        from apps.content.serializers import (
+            DupeProductListSerializer, 
+            AirAmbienceListSerializer,
+            PerfumeOilListSerializer
+        )
         
         # Try generic relation first
         if obj.item:
             if isinstance(obj.item, DupeProduct):
                 return DupeProductListSerializer(obj.item).data
+            elif isinstance(obj.item, AirAmbience):
+                return AirAmbienceListSerializer(obj.item).data
+            elif isinstance(obj.item, PerfumeOil):
+                return PerfumeOilListSerializer(obj.item).data
             else:
                 return ProductListSerializer(obj.item).data
         
