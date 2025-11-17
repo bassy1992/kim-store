@@ -92,7 +92,7 @@ export default function PerfumeOils() {
         name: product.name,
         price: parseFloat(product.price),
         image: product.image || getDefaultImage(product.scent_family),
-        productId: product.id, // Numeric ID for cart API
+        perfumeOilId: product.id, // Numeric ID for cart API
         slug: product.slug, // Add slug for product links
         size: product.size_options.split(',')[0].trim() // Use first size option
       });

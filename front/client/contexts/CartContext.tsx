@@ -31,6 +31,8 @@ export type CartItem = {
   quantity: number;
   productId?: number;
   dupeId?: number;
+  airAmbienceId?: number;
+  perfumeOilId?: number;
   size?: string;
   slug?: string; // Product slug for routing
 };
@@ -148,13 +150,21 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         headers['X-Cart-ID'] = cartId;
       }
 
-      // Build request body - support both product_id and dupe_id
+      // Build request body - support product_id, dupe_id, air_ambience_id, and perfume_oil_id
       const requestBody: any = {
         quantity,
         size: item.size || '50ml',
       };
 
-      if (item.dupeId) {
+      if (item.airAmbienceId) {
+        // Adding an air ambience product
+        requestBody.air_ambience_id = item.airAmbienceId;
+        console.log('Adding air ambience to cart:', { air_ambience_id: item.airAmbienceId, quantity });
+      } else if (item.perfumeOilId) {
+        // Adding a perfume oil product
+        requestBody.perfume_oil_id = item.perfumeOilId;
+        console.log('Adding perfume oil to cart:', { perfume_oil_id: item.perfumeOilId, quantity });
+      } else if (item.dupeId) {
         // Adding a dupe product
         requestBody.dupe_id = item.dupeId;
         console.log('Adding dupe to cart:', { dupe_id: item.dupeId, quantity });
@@ -166,8 +176,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         // Try to parse the string ID to number
         const parsedId = parseInt(item.id, 10);
         if (isNaN(parsedId) || parsedId <= 0) {
-          console.error('Invalid product/dupe ID:', item.id, 'Item:', item);
-          throw new Error(`Invalid product/dupe ID: ${item.id}`);
+          console.error('Invalid product ID:', item.id, 'Item:', item);
+          throw new Error(`Invalid product ID: ${item.id}`);
         }
         requestBody.product_id = parsedId;
         console.log('Adding product to cart (parsed):', { product_id: parsedId, quantity });

@@ -108,7 +108,7 @@ export default function AirAmbience() {
         name: product.name,
         price: parseFloat(product.price),
         image: product.image || getProductImage(product.product_type),
-        productId: product.id, // Numeric ID for cart API
+        airAmbienceId: product.id, // Numeric ID for cart API
         slug: product.slug, // Add slug for product links
         size: '50ml' // Default size for air ambience products
       });
