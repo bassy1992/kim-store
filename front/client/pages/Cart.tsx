@@ -109,14 +109,14 @@ export default function Cart() {
 
                     {/* Product Info */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1">
+                      <div className="flex items-start justify-between gap-2 sm:gap-4">
+                        <div className="flex-1 min-w-0">
                           <Link to={`/product/${item.slug || item.productId}`} className="group/link">
-                            <h3 className="font-display text-lg md:text-xl font-semibold group-hover/link:text-primary transition-colors line-clamp-2">
+                            <h3 className="font-display text-base sm:text-lg md:text-xl font-semibold group-hover/link:text-primary transition-colors line-clamp-2">
                               {item.name}
                             </h3>
                           </Link>
-                          <p className="text-sm text-muted-foreground mt-1">
+                          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                             ₵{item.price.toFixed(2)} each
                           </p>
                         </div>
@@ -124,43 +124,46 @@ export default function Cart() {
                         {/* Remove Button */}
                         <button
                           onClick={() => handleRemove(item.id)}
-                          className="p-2 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                          className="p-1.5 sm:p-2 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors flex-shrink-0"
                           title="Remove item"
+                          aria-label="Remove item from cart"
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                           </svg>
                         </button>
                       </div>
 
                       {/* Quantity and Price */}
-                      <div className="flex items-center justify-between mt-4 pt-4 border-t">
-                        <div className="flex items-center gap-3">
-                          <span className="text-sm text-muted-foreground">Quantity:</span>
-                          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mt-4 pt-4 border-t">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">Quantity:</span>
+                          <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg bg-muted">
                             <button 
                               onClick={() => handleUpdateQuantity(item.id, Math.max(1, item.quantity - 1))}
                               disabled={item.quantity <= 1}
-                              className="text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed p-1"
+                              aria-label="Decrease quantity"
                             >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
                               </svg>
                             </button>
-                            <span className="font-semibold min-w-[2ch] text-center">{item.quantity}</span>
+                            <span className="font-semibold min-w-[2ch] text-center text-sm sm:text-base">{item.quantity}</span>
                             <button 
                               onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
-                              className="text-muted-foreground hover:text-foreground transition-colors"
+                              className="text-muted-foreground hover:text-foreground transition-colors p-1"
+                              aria-label="Increase quantity"
                             >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                               </svg>
                             </button>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <p className="text-sm text-muted-foreground">Subtotal</p>
-                          <p className="text-xl font-bold text-primary">
+                        <div className="flex items-center justify-between sm:block sm:text-right">
+                          <p className="text-xs sm:text-sm text-muted-foreground">Subtotal</p>
+                          <p className="text-lg sm:text-xl font-bold text-primary">
                             ₵{itemSubtotal.toFixed(2)}
                           </p>
                         </div>
