@@ -53,7 +53,7 @@ class CartViewSet(viewsets.ViewSet):
         return cart
     
     def list(self, request):
-        """Get current cart"""
+        """Get current cart - this is required for router to register the viewset"""
         cart = self.get_cart(request)
         # Optimize: Use select_related and prefetch_related to reduce queries
         cart = Cart.objects.select_related('promo_code').prefetch_related(
@@ -64,6 +64,10 @@ class CartViewSet(viewsets.ViewSet):
         response = Response(serializer.data)
         response['X-Cart-ID'] = str(cart.id)
         return response
+    
+    def create(self, request):
+        """Alias for add_item to support POST to /cart/ endpoint"""
+        return self.add_item(request)
     
     @action(detail=False, methods=['post'], url_path='items')
     def add_item(self, request):
