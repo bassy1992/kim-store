@@ -11,7 +11,7 @@ export default function ProductDetails() {
   const { id } = useParams();
   const { add } = useCart();
   const [imgIndex, setImgIndex] = useState(0);
-  const [size, setSize] = useState("50ml");
+  const [size, setSize] = useState("");
   const [qty, setQty] = useState(1);
 
   // Fetch product details from API
@@ -39,6 +39,16 @@ export default function ProductDetails() {
     : [defaultImage];
   
   const image = productImages[imgIndex] || defaultImage;
+
+  // Parse size options from product data
+  const sizeOptions = product?.size_options 
+    ? product.size_options.split(',').map(s => s.trim()).filter(s => s)
+    : ['50ml'];
+
+  // Set default size when product loads
+  if (product && !size && sizeOptions.length > 0) {
+    setSize(sizeOptions[0]);
+  }
 
   // Loading state
   if (isLoading) {
@@ -120,9 +130,9 @@ export default function ProductDetails() {
             <div>
               <label className="text-sm text-muted-foreground">Size</label>
               <select value={size} onChange={(e) => setSize(e.target.value)} className="ml-2 rounded-md border px-3 py-2 transition-shadow hover:shadow-sm">
-                <option>30ml</option>
-                <option>50ml</option>
-                <option>100ml</option>
+                {sizeOptions.map((sizeOption) => (
+                  <option key={sizeOption} value={sizeOption}>{sizeOption}</option>
+                ))}
               </select>
             </div>
 

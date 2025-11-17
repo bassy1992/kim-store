@@ -31,6 +31,7 @@ export interface Product {
     slug: string;
   };
   stock_quantity: number;
+  size_options?: string;
   primary_image?: string;
   tag?: string;
   average_rating?: number;
