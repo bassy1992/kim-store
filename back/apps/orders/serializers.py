@@ -4,14 +4,39 @@ from apps.products.serializers import ProductListSerializer
 
 
 class CartItemSerializer(serializers.ModelSerializer):
-    """Serializer for cart items with product details"""
-    product = ProductListSerializer(read_only=True)
-    product_id = serializers.IntegerField(write_only=True)
+    """Serializer for cart items with product details - supports Product and DupeProduct"""
+    product = serializers.SerializerMethodField()
+    product_id = serializers.IntegerField(write_only=True, required=False)
+    dupe_id = serializers.IntegerField(write_only=True, required=False)
     subtotal = serializers.SerializerMethodField()
     
     class Meta:
         model = CartItem
-        fields = ['id', 'product', 'product_id', 'quantity', 'size', 'subtotal']
+        fields = ['id', 'product', 'product_id', 'dupe_id', 'quantity', 'size', 'subtotal']
+    
+    def get_product(self, obj):
+        """Get product details from either Product or DupeProduct"""
+        from apps.content.models import DupeProduct
+        from apps.content.serializers import DupeProductListSerializer
+        
+        # Try generic relation first
+        if obj.item:
+            if isinstance(obj.item, DupeProduct):
+                return DupeProductListSerializer(obj.item).data
+            else:
+                return ProductListSerializer(obj.item).data
+        
+        # Fallback to legacy product field
+        if obj.product:
+            return ProductListSerializer(obj.product).data
+        
+        # Fallback to cached data
+        return {
+            'id': obj.object_id,
+            'name': obj.product_name,
+            'price': str(obj.product_price),
+            'slug': '',
+        }
     
     def get_subtotal(self, obj):
         return float(obj.get_subtotal())

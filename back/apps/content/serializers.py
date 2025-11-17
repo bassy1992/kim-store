@@ -75,14 +75,13 @@ class NewsletterSerializer(serializers.ModelSerializer):
 class DupeProductListSerializer(serializers.ModelSerializer):
     savings = serializers.SerializerMethodField()
     savings_percentage = serializers.SerializerMethodField()
-    product_id = serializers.IntegerField(source='product.id', read_only=True, allow_null=True)
     
     class Meta:
         model = DupeProduct
         fields = [
             'id', 'slug', 'name', 'price', 'designer_brand', 'designer_fragrance',
             'designer_price', 'similarity_percentage', 'image_url', 'is_featured',
-            'savings', 'savings_percentage', 'product_id'
+            'savings', 'savings_percentage'
         ]
     
     def get_savings(self, obj):

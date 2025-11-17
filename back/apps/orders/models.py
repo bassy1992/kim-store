@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from apps.products.models import Product
 import uuid
 from datetime import datetime
@@ -126,21 +128,49 @@ class Cart(models.Model):
 
 
 class CartItem(models.Model):
-    """Items in a shopping cart"""
+    """Items in a shopping cart - supports both Product and DupeProduct"""
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    
+    # Generic relation to support multiple product types
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True, blank=True)
+    object_id = models.PositiveIntegerField(null=True, blank=True)
+    item = GenericForeignKey('content_type', 'object_id')
+    
+    # Keep legacy product field for backward compatibility
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True)
+    
     quantity = models.PositiveIntegerField(default=1)
     size = models.CharField(max_length=20, default='50ml')
     
+    # Cache product details for performance
+    product_name = models.CharField(max_length=200, blank=True)
+    product_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    
     class Meta:
-        unique_together = ['cart', 'product', 'size']
+        indexes = [
+            models.Index(fields=['content_type', 'object_id']),
+        ]
+    
+    def save(self, *args, **kwargs):
+        # Cache product details
+        if self.item:
+            self.product_name = self.item.name
+            self.product_price = self.item.price
+        elif self.product:
+            self.product_name = self.product.name
+            self.product_price = self.product.price
+        super().save(*args, **kwargs)
     
     def __str__(self):
-        return f"{self.quantity}x {self.product.name} ({self.size})"
+        return f"{self.quantity}x {self.product_name} ({self.size})"
+    
+    def get_product(self):
+        """Get the actual product object (Product or DupeProduct)"""
+        return self.item if self.item else self.product
     
     def get_subtotal(self):
         """Calculate subtotal for this item"""
-        return self.product.price * self.quantity
+        return self.product_price * self.quantity
 
 
 class Order(models.Model):

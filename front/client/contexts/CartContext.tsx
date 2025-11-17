@@ -20,6 +20,7 @@ export type CartItem = {
   image: string;
   quantity: number;
   productId?: number;
+  dupeId?: number;
   size?: string;
 };
 
@@ -114,19 +115,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const add = async (item: Omit<CartItem, "quantity">, quantity: number = 1) => {
     setLoading(true);
     try {
-      // Get product ID - try productId first, then parse id
-      let productId = item.productId;
-      if (!productId) {
-        // Try to parse the string ID to number
-        const parsedId = parseInt(item.id, 10);
-        if (isNaN(parsedId) || parsedId <= 0) {
-          console.error('Invalid product ID:', item.id, 'Item:', item);
-          throw new Error(`Invalid product ID: ${item.id}`);
-        }
-        productId = parsedId;
-      }
-
-      console.log('Adding to cart:', { productId, item, quantity });
+      console.log('Adding to cart:', { item, quantity });
 
       // Get cart ID from localStorage
       const cartId = localStorage.getItem('cartId');
@@ -138,14 +127,35 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         headers['X-Cart-ID'] = cartId;
       }
 
+      // Build request body - support both product_id and dupe_id
+      const requestBody: any = {
+        quantity,
+        size: item.size || '50ml',
+      };
+
+      if (item.dupeId) {
+        // Adding a dupe product
+        requestBody.dupe_id = item.dupeId;
+        console.log('Adding dupe to cart:', { dupe_id: item.dupeId, quantity });
+      } else if (item.productId) {
+        // Adding a regular product
+        requestBody.product_id = item.productId;
+        console.log('Adding product to cart:', { product_id: item.productId, quantity });
+      } else {
+        // Try to parse the string ID to number
+        const parsedId = parseInt(item.id, 10);
+        if (isNaN(parsedId) || parsedId <= 0) {
+          console.error('Invalid product/dupe ID:', item.id, 'Item:', item);
+          throw new Error(`Invalid product/dupe ID: ${item.id}`);
+        }
+        requestBody.product_id = parsedId;
+        console.log('Adding product to cart (parsed):', { product_id: parsedId, quantity });
+      }
+
       const response = await fetch(`${API_BASE_URL}/cart/items/`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({
-          product_id: productId,
-          quantity,
-          size: item.size || '50ml',
-        }),
+        body: JSON.stringify(requestBody),
       });
       
       // Store cart ID from response

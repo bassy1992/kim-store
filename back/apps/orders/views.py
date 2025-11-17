@@ -66,36 +66,65 @@ class CartViewSet(viewsets.ViewSet):
     
     @action(detail=False, methods=['post'], url_path='items')
     def add_item(self, request):
-        """Add item to cart"""
+        """Add item to cart - supports both Product and DupeProduct"""
+        from django.contrib.contenttypes.models import ContentType
+        from apps.content.models import DupeProduct
+        
         cart = self.get_cart(request)
         product_id = request.data.get('product_id')
+        dupe_id = request.data.get('dupe_id')
         quantity = int(request.data.get('quantity', 1))
         size = request.data.get('size', '50ml')
         
-        print(f"Adding item - Cart ID: {cart.id}, Product ID: {product_id}, Quantity: {quantity}")
+        print(f"Adding item - Cart ID: {cart.id}, Product ID: {product_id}, Dupe ID: {dupe_id}, Quantity: {quantity}")
         
-        if not product_id:
+        if not product_id and not dupe_id:
             return Response(
-                {'error': 'product_id is required'},
+                {'error': 'Either product_id or dupe_id is required'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        product = get_object_or_404(Product, id=product_id)
-        
-        # Check stock availability
-        if product.stock_quantity < quantity:
-            return Response(
-                {'error': f'Insufficient stock. Available: {product.stock_quantity}'},
-                status=status.HTTP_400_BAD_REQUEST
+        # Determine which type of product we're adding
+        if dupe_id:
+            # Adding a DupeProduct
+            item_obj = get_object_or_404(DupeProduct, id=dupe_id)
+            content_type = ContentType.objects.get_for_model(DupeProduct)
+            
+            # Check stock availability
+            if item_obj.stock_quantity < quantity:
+                return Response(
+                    {'error': f'Insufficient stock. Available: {item_obj.stock_quantity}'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Get or create cart item for dupe
+            cart_item, created = CartItem.objects.get_or_create(
+                cart=cart,
+                content_type=content_type,
+                object_id=dupe_id,
+                size=size,
+                defaults={'quantity': quantity}
             )
-        
-        # Get or create cart item
-        cart_item, created = CartItem.objects.get_or_create(
-            cart=cart,
-            product=product,
-            size=size,
-            defaults={'quantity': quantity}
-        )
+        else:
+            # Adding a regular Product
+            item_obj = get_object_or_404(Product, id=product_id)
+            content_type = ContentType.objects.get_for_model(Product)
+            
+            # Check stock availability
+            if item_obj.stock_quantity < quantity:
+                return Response(
+                    {'error': f'Insufficient stock. Available: {item_obj.stock_quantity}'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Get or create cart item for product
+            cart_item, created = CartItem.objects.get_or_create(
+                cart=cart,
+                content_type=content_type,
+                object_id=product_id,
+                size=size,
+                defaults={'quantity': quantity, 'product': item_obj}  # Keep legacy field for compatibility
+            )
         
         if not created:
             # Update quantity if item already exists
