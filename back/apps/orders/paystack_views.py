@@ -80,7 +80,12 @@ def initialize_payment(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def verify_payment(request):
-    """Verify Paystack payment"""
+    """Verify Paystack payment and create order"""
+    from .models import Order, OrderItem, Cart
+    from apps.products.models import Product
+    from apps.content.models import DupeProduct
+    from django.contrib.contenttypes.models import ContentType
+    
     try:
         reference = request.data.get('reference')
         
@@ -95,16 +100,73 @@ def verify_payment(request):
             'Content-Type': 'application/json'
         }
         
-        response = requests.get(
+        paystack_response = requests.get(
             f'{PAYSTACK_BASE_URL}/transaction/verify/{reference}',
             headers=headers,
             timeout=30
         )
         
-        if response.status_code == 200:
-            return Response(response.json())
+        if paystack_response.status_code == 200:
+            paystack_data = paystack_response.json()
+            
+            # Check if payment was successful
+            if paystack_data.get('status') and paystack_data.get('data', {}).get('status') == 'success':
+                transaction_data = paystack_data['data']
+                
+                # Get customer details from metadata
+                metadata = transaction_data.get('metadata', {})
+                cart_id = metadata.get('cart_id')
+                customer_email = transaction_data.get('customer', {}).get('email')
+                amount = transaction_data.get('amount', 0) / 100  # Convert from kobo/pesewas
+                
+                # Create order
+                order = Order.objects.create(
+                    email=customer_email or metadata.get('email', 'unknown@email.com'),
+                    full_name=metadata.get('full_name', 'Customer'),
+                    phone=metadata.get('phone', ''),
+                    shipping_address=metadata.get('shipping_address', ''),
+                    total_amount=amount,
+                    status='processing',
+                    payment_reference=reference
+                )
+                
+                # Get cart items and create order items
+                if cart_id:
+                    try:
+                        cart = Cart.objects.get(id=cart_id)
+                        for cart_item in cart.items.all():
+                            # Get product details
+                            product_obj = cart_item.get_product()
+                            
+                            OrderItem.objects.create(
+                                order=order,
+                                product_name=cart_item.product_name or product_obj.name,
+                                product_price=cart_item.product_price or product_obj.price,
+                                quantity=cart_item.quantity,
+                                size=cart_item.size,
+                                subtotal=cart_item.get_subtotal()
+                            )
+                    except Cart.DoesNotExist:
+                        pass
+                
+                # Return success with order details
+                return Response({
+                    'status': True,
+                    'message': 'Verification successful',
+                    'data': {
+                        'status': 'success',
+                        'reference': reference,
+                        'amount': amount,
+                        'order_number': order.order_number,
+                        'total_amount': str(order.total_amount),
+                        'email': order.email,
+                        'full_name': order.full_name
+                    }
+                })
+            
+            return Response(paystack_data)
         else:
-            error_data = response.json() if response.content else {'message': 'Payment verification failed'}
+            error_data = paystack_response.json() if paystack_response.content else {'message': 'Payment verification failed'}
             return Response({
                 'error': error_data.get('message', 'Payment verification failed'),
                 'details': error_data

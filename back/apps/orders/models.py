@@ -201,6 +201,9 @@ class Order(models.Model):
     promo_discount_type = models.CharField(max_length=20, blank=True)
     promo_discount_value = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     
+    # Payment info
+    payment_reference = models.CharField(max_length=100, blank=True, unique=True, null=True)
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
