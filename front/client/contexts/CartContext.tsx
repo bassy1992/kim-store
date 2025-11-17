@@ -207,6 +207,21 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   // Update item quantity
   const updateQuantity = async (id: string, quantity: number) => {
+    // Optimistic update - update UI immediately
+    setItems(prevItems => 
+      prevItems.map(item => 
+        item.id === id ? { ...item, quantity } : item
+      )
+    );
+    
+    // Recalculate totals optimistically
+    const newSubtotal = items.reduce((sum, item) => {
+      const qty = item.id === id ? quantity : item.quantity;
+      return sum + (item.price * qty);
+    }, 0);
+    setSubtotal(newSubtotal);
+    setTotal(newSubtotal - discountAmount);
+    
     setLoading(true);
     try {
       const cartId = localStorage.getItem('cartId');
@@ -225,7 +240,24 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (response.ok) {
-        await refreshCart();
+        // Optimistic update - use response data instead of refetching
+        const cartData = await response.json();
+        const transformedItems: CartItem[] = (cartData.items || []).map((item: any) => ({
+          id: String(item.id),
+          name: item.product.name,
+          price: parseFloat(item.product.price),
+          image: item.product.primary_image || '/placeholder.jpg',
+          quantity: item.quantity,
+          productId: item.product.id,
+          slug: item.product.slug,
+          size: item.size,
+        }));
+        
+        setItems(transformedItems);
+        setPromoCode(cartData.promo_code);
+        setSubtotal(parseFloat(cartData.subtotal || 0));
+        setDiscountAmount(parseFloat(cartData.discount_amount || 0));
+        setTotal(parseFloat(cartData.total || 0));
       } else if (response.status === 404) {
         // Item not found - cart might be stale, refresh it
         console.warn('Cart item not found, refreshing cart...');
@@ -261,7 +293,24 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (response.ok) {
-        await refreshCart();
+        // Optimistic update - use response data instead of refetching
+        const cartData = await response.json();
+        const transformedItems: CartItem[] = (cartData.items || []).map((item: any) => ({
+          id: String(item.id),
+          name: item.product.name,
+          price: parseFloat(item.product.price),
+          image: item.product.primary_image || '/placeholder.jpg',
+          quantity: item.quantity,
+          productId: item.product.id,
+          slug: item.product.slug,
+          size: item.size,
+        }));
+        
+        setItems(transformedItems);
+        setPromoCode(cartData.promo_code);
+        setSubtotal(parseFloat(cartData.subtotal || 0));
+        setDiscountAmount(parseFloat(cartData.discount_amount || 0));
+        setTotal(parseFloat(cartData.total || 0));
       } else if (response.status === 404) {
         // Item not found - cart might be stale, refresh it
         console.warn('Cart item not found, refreshing cart...');
@@ -276,6 +325,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   // Clear cart
   const clear = async () => {
+    // Optimistic update - clear immediately for instant feedback
+    setItems([]);
+    setPromoCode(undefined);
+    setSubtotal(0);
+    setDiscountAmount(0);
+    setTotal(0);
+    
     setLoading(true);
     try {
       const cartId = localStorage.getItem('cartId');
@@ -292,15 +348,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         headers,
       });
 
-      if (response.ok) {
-        setItems([]);
-        setPromoCode(undefined);
-        setSubtotal(0);
-        setDiscountAmount(0);
-        setTotal(0);
+      if (!response.ok) {
+        // If failed, refresh to get actual state
+        await refreshCart();
       }
     } catch (error) {
       console.error('Failed to clear cart:', error);
+      // Refresh on error to get actual state
+      await refreshCart();
     } finally {
       setLoading(false);
     }
