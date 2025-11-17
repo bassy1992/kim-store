@@ -55,10 +55,11 @@ class CartViewSet(viewsets.ViewSet):
     def list(self, request):
         """Get current cart"""
         cart = self.get_cart(request)
-        print(f"LIST: Getting cart {cart.id}, items: {cart.items.count()}")
-        # Ensure items are loaded
-        cart = Cart.objects.prefetch_related('items__product').get(id=cart.id)
-        print(f"LIST: After prefetch, cart {cart.id}, items: {cart.items.count()}")
+        # Optimize: Use select_related and prefetch_related to reduce queries
+        cart = Cart.objects.select_related('promo_code').prefetch_related(
+            'items__product__category',
+            'items__product__images'
+        ).get(id=cart.id)
         serializer = CartSerializer(cart, context={'request': request})
         response = Response(serializer.data)
         response['X-Cart-ID'] = str(cart.id)
@@ -136,14 +137,13 @@ class CartViewSet(viewsets.ViewSet):
         # Refresh cart from database to ensure we have latest data
         cart.refresh_from_db()
         
-        print(f"After refresh - Cart items count: {cart.items.count()}")
-        
-        # Reload cart with prefetched items to ensure they're included in response
-        cart = Cart.objects.prefetch_related('items__product').get(id=cart.id)
-        print(f"After prefetch - Cart items count: {cart.items.count()}")
+        # Reload cart with optimized prefetching
+        cart = Cart.objects.select_related('promo_code').prefetch_related(
+            'items__product__category',
+            'items__product__images'
+        ).get(id=cart.id)
         
         serializer = CartSerializer(cart, context={'request': request})
-        print(f"Serialized cart data items: {len(serializer.data.get('items', []))}")
         
         response = Response(serializer.data, status=status.HTTP_201_CREATED)
         response['X-Cart-ID'] = str(cart.id)
@@ -168,8 +168,11 @@ class CartViewSet(viewsets.ViewSet):
             cart_item.quantity = quantity
             cart_item.save()
         
-        # Reload cart with prefetched items
-        cart = Cart.objects.prefetch_related('items__product').get(id=cart.id)
+        # Reload cart with optimized prefetching
+        cart = Cart.objects.select_related('promo_code').prefetch_related(
+            'items__product__category',
+            'items__product__images'
+        ).get(id=cart.id)
         serializer = CartSerializer(cart, context={'request': request})
         return Response(serializer.data)
     
@@ -179,8 +182,11 @@ class CartViewSet(viewsets.ViewSet):
         cart_item = get_object_or_404(CartItem, id=item_id, cart=cart)
         cart_item.delete()
         
-        # Reload cart with prefetched items
-        cart = Cart.objects.prefetch_related('items__product').get(id=cart.id)
+        # Reload cart with optimized prefetching
+        cart = Cart.objects.select_related('promo_code').prefetch_related(
+            'items__product__category',
+            'items__product__images'
+        ).get(id=cart.id)
         serializer = CartSerializer(cart, context={'request': request})
         return Response(serializer.data)
     
@@ -192,8 +198,11 @@ class CartViewSet(viewsets.ViewSet):
         cart.promo_code = None
         cart.save()
         
-        # Reload cart with prefetched items
-        cart = Cart.objects.prefetch_related('items__product').get(id=cart.id)
+        # Reload cart with optimized prefetching
+        cart = Cart.objects.select_related('promo_code').prefetch_related(
+            'items__product__category',
+            'items__product__images'
+        ).get(id=cart.id)
         serializer = CartSerializer(cart, context={'request': request})
         return Response(serializer.data)
     
@@ -237,8 +246,11 @@ class CartViewSet(viewsets.ViewSet):
         cart.promo_code = promo
         cart.save()
         
-        # Reload cart with prefetched items
-        cart = Cart.objects.prefetch_related('items__product').get(id=cart.id)
+        # Reload cart with optimized prefetching
+        cart = Cart.objects.select_related('promo_code').prefetch_related(
+            'items__product__category',
+            'items__product__images'
+        ).get(id=cart.id)
         serializer = CartSerializer(cart, context={'request': request})
         return Response({
             'message': f'Promo code "{promo_code}" applied successfully!',
@@ -252,8 +264,11 @@ class CartViewSet(viewsets.ViewSet):
         cart.promo_code = None
         cart.save()
         
-        # Reload cart with prefetched items
-        cart = Cart.objects.prefetch_related('items__product').get(id=cart.id)
+        # Reload cart with optimized prefetching
+        cart = Cart.objects.select_related('promo_code').prefetch_related(
+            'items__product__category',
+            'items__product__images'
+        ).get(id=cart.id)
         serializer = CartSerializer(cart, context={'request': request})
         return Response({
             'message': 'Promo code removed',

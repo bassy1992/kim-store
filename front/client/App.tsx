@@ -31,9 +31,11 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 1, // Only retry once instead of 3 times
+      retry: 0, // No retries for faster failure feedback
       refetchOnWindowFocus: false, // Don't refetch when window regains focus
-      staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
+      staleTime: 10 * 60 * 1000, // Consider data fresh for 10 minutes (categories rarely change)
+      cacheTime: 15 * 60 * 1000, // Keep unused data in cache for 15 minutes
+      refetchOnMount: false, // Don't refetch on component mount if data exists
     },
   },
 });

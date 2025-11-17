@@ -85,6 +85,7 @@ export default function ProductCard({ product }: { product: Product }) {
           alt={product.name}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
           loading="lazy"
+          decoding="async"
         />
 
         {/* Large Add to Cart Overlay */}

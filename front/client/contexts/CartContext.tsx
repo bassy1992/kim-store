@@ -169,8 +169,26 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
       if (response.ok) {
         console.log('✅ Successfully added to cart');
-        await refreshCart();
-        // Show success message
+        const cartData = await response.json();
+        
+        // Optimistic update - update state directly instead of refetching
+        const transformedItems: CartItem[] = (cartData.items || []).map((item: any) => ({
+          id: String(item.id),
+          name: item.product.name,
+          price: parseFloat(item.product.price),
+          image: item.product.primary_image || '/placeholder.jpg',
+          quantity: item.quantity,
+          productId: item.product.id,
+          slug: item.product.slug,
+          size: item.size,
+        }));
+        
+        setItems(transformedItems);
+        setPromoCode(cartData.promo_code);
+        setSubtotal(parseFloat(cartData.subtotal || 0));
+        setDiscountAmount(parseFloat(cartData.discount_amount || 0));
+        setTotal(parseFloat(cartData.total || 0));
+        
         console.log(`🎉 Added ${item.name} to cart!`);
       } else {
         const error = await response.json().catch(() => ({ error: 'Unknown server error' }));

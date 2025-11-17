@@ -9,6 +9,7 @@ export default function Shop() {
   const [sortBy, setSortBy] = useState("featured");
   const [filterBy, setFilterBy] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   // Initialize search query and filters from URL params
@@ -18,11 +19,21 @@ export default function Shop() {
     
     if (urlSearch) {
       setSearchQuery(urlSearch);
+      setDebouncedSearch(urlSearch);
     }
     if (urlCategory) {
       setFilterBy(urlCategory);
     }
   }, [searchParams]);
+
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 300); // Wait 300ms after user stops typing
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   // Fetch categories
   const { data: categoriesData } = useQuery({
@@ -30,24 +41,19 @@ export default function Shop() {
     queryFn: categoriesApi.list,
   });
 
-  // Fetch products with filters
+  // Fetch products with filters (using debounced search)
   const { data: productsData, isLoading, error } = useQuery({
-    queryKey: ['products', filterBy, sortBy, searchQuery],
+    queryKey: ['products', filterBy, sortBy, debouncedSearch],
     queryFn: () => {
-      console.log('🔍 Search Query:', searchQuery);
-      console.log('📂 Filter By:', filterBy);
-      console.log('🔄 Sort By:', sortBy);
-      
       const params = {
         category: filterBy !== 'all' ? filterBy : undefined,
         sort_by: sortBy,
-        search: searchQuery || undefined,
+        search: debouncedSearch || undefined,
       };
-      
-      console.log('📡 API Params:', params);
       
       return productsApi.list(params);
     },
+    staleTime: 2 * 60 * 1000, // Cache product lists for 2 minutes
   });
 
   const products = productsData?.results || [];
