@@ -213,7 +213,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         const error = await response.json().catch(() => ({ error: 'Unknown server error' }));
         console.error('❌ Failed to add to cart:', error);
         console.error('Response status:', response.status);
-        console.error('Request body was:', { product_id: productId, quantity, size: item.size || '50ml' });
+        console.error('Request body was:', requestBody);
         throw new Error(error.error || error.detail || `Server error: ${response.status}`);
       }
     } catch (error) {
