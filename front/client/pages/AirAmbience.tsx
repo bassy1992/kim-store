@@ -104,11 +104,12 @@ export default function AirAmbience() {
     setAddingToCart(product.id);
     try {
       await addToCart({
-        id: product.id.toString(),
+        id: product.slug, // Use slug for routing
         name: product.name,
         price: parseFloat(product.price),
         image: product.image || getProductImage(product.product_type),
-        productId: product.id,
+        productId: product.id, // Numeric ID for cart API
+        slug: product.slug, // Add slug for product links
         size: '50ml' // Default size for air ambience products
       });
       

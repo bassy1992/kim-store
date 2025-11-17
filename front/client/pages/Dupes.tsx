@@ -90,11 +90,12 @@ export default function Dupes() {
     setAddingToCart(product.id);
     try {
       await addToCart({
-        id: product.slug,
+        id: product.slug, // Use slug for routing
         name: product.name,
         price: parseFloat(product.price),
         image: product.image || '/placeholder.jpg',
         dupeId: product.id,  // Send dupe_id instead of product_id
+        slug: product.slug, // Add slug for product links
         size: '50ml'
       });
       

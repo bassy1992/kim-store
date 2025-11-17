@@ -88,11 +88,12 @@ export default function PerfumeOils() {
     setAddingToCart(product.id);
     try {
       await addToCart({
-        id: product.id.toString(),
+        id: product.slug, // Use slug for routing
         name: product.name,
         price: parseFloat(product.price),
         image: product.image || getDefaultImage(product.scent_family),
-        productId: product.id,
+        productId: product.id, // Numeric ID for cart API
+        slug: product.slug, // Add slug for product links
         size: product.size_options.split(',')[0].trim() // Use first size option
       });
       
