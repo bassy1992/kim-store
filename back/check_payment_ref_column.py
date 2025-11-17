@@ -10,7 +10,7 @@ cursor = connection.cursor()
 cursor.execute("""
     SELECT column_name, character_maximum_length, data_type 
     FROM information_schema.columns 
-    WHERE table_name='orders_order' AND column_name='payment_reference'
+    WHERE table_name='orders_order' AND column_name='phone'
 """)
 result = cursor.fetchone()
 if result:

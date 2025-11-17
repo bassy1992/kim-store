@@ -120,15 +120,20 @@ def verify_payment(request):
                 amount = transaction_data.get('amount', 0) / 100  # Convert from kobo/pesewas
                 
                 # Create order
-                order = Order.objects.create(
-                    email=customer_email or metadata.get('email', 'unknown@email.com'),
-                    full_name=metadata.get('full_name', 'Customer'),
-                    phone=metadata.get('phone', ''),
-                    shipping_address=metadata.get('shipping_address', ''),
-                    total_amount=amount,
-                    status='processing',
-                    payment_reference=reference
-                )
+                try:
+                    order = Order.objects.create(
+                        email=customer_email or metadata.get('email', 'unknown@email.com'),
+                        full_name=metadata.get('full_name', 'Customer'),
+                        phone=metadata.get('phone', '')[:50],  # Truncate to 50 chars
+                        shipping_address=metadata.get('shipping_address', ''),
+                        total_amount=amount,
+                        status='processing',
+                        payment_reference=reference[:100]  # Truncate to 100 chars
+                    )
+                except Exception as e:
+                    print(f"Error creating order: {e}")
+                    print(f"Data: email={customer_email}, full_name={metadata.get('full_name')}, phone={metadata.get('phone')}, reference={reference}")
+                    raise
                 
                 # Get cart items and create order items
                 if cart_id:
