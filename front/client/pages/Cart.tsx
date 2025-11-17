@@ -1,9 +1,36 @@
 import { useCart } from "@/contexts/CartContext";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useMemo, useCallback } from "react";
 
 export default function Cart() {
   const { items, remove, total, clear, updateQuantity } = useCart();
+
+  // Memoize calculations to prevent recalculation on every render
+  const calculations = useMemo(() => {
+    const subtotal = total;
+    const tax = total * 0.1;
+    const finalTotal = total * 1.1;
+    
+    return {
+      subtotal,
+      tax,
+      finalTotal
+    };
+  }, [total]);
+
+  // Memoize handlers to prevent recreation on every render
+  const handleRemove = useCallback((id: string) => {
+    remove(id);
+  }, [remove]);
+
+  const handleClear = useCallback(() => {
+    clear();
+  }, [clear]);
+
+  const handleUpdateQuantity = useCallback((id: string, quantity: number) => {
+    updateQuantity(id, quantity);
+  }, [updateQuantity]);
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-background to-muted/20">
@@ -58,7 +85,11 @@ export default function Cart() {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Cart Items */}
             <div className="lg:col-span-2 space-y-4">
-              {items.map((item, index) => (
+              {items.map((item, index) => {
+                // Memoize item subtotal calculation
+                const itemSubtotal = item.price * item.quantity;
+                
+                return (
                 <div 
                   key={item.id} 
                   className="group relative bg-card rounded-2xl border p-4 md:p-6 hover:shadow-lg transition-all animate-fade-in"
@@ -92,7 +123,7 @@ export default function Cart() {
 
                         {/* Remove Button */}
                         <button
-                          onClick={() => remove(item.id)}
+                          onClick={() => handleRemove(item.id)}
                           className="p-2 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
                           title="Remove item"
                         >
@@ -108,7 +139,7 @@ export default function Cart() {
                           <span className="text-sm text-muted-foreground">Quantity:</span>
                           <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted">
                             <button 
-                              onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                              onClick={() => handleUpdateQuantity(item.id, Math.max(1, item.quantity - 1))}
                               disabled={item.quantity <= 1}
                               className="text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
@@ -118,7 +149,7 @@ export default function Cart() {
                             </button>
                             <span className="font-semibold min-w-[2ch] text-center">{item.quantity}</span>
                             <button 
-                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
                               className="text-muted-foreground hover:text-foreground transition-colors"
                             >
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -130,18 +161,19 @@ export default function Cart() {
                         <div className="text-right">
                           <p className="text-sm text-muted-foreground">Subtotal</p>
                           <p className="text-xl font-bold text-primary">
-                            ₵{(item.price * item.quantity).toFixed(2)}
+                            ₵{itemSubtotal.toFixed(2)}
                           </p>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
 
               {/* Clear Cart Button */}
               <button
-                onClick={clear}
+                onClick={handleClear}
                 className="w-full py-3 rounded-xl border-2 border-dashed border-muted-foreground/30 text-muted-foreground hover:border-destructive hover:text-destructive hover:bg-destructive/5 transition-all flex items-center justify-center gap-2"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -161,22 +193,22 @@ export default function Cart() {
                   <div className="space-y-3 py-4 border-y">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Subtotal</span>
-                      <span className="font-medium">₵{total.toFixed(2)}</span>
+                      <span className="font-medium">₵{calculations.subtotal.toFixed(2)}</span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Shipping</span>
                       <span className="font-medium text-green-600">Free</span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Tax</span>
-                      <span className="font-medium">₵{(total * 0.1).toFixed(2)}</span>
+                      <span className="text-muted-foreground">Tax (10%)</span>
+                      <span className="font-medium">₵{calculations.tax.toFixed(2)}</span>
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between pt-2">
                     <span className="font-display text-lg font-semibold">Total</span>
                     <span className="font-display text-3xl font-bold text-primary">
-                      ₵{(total * 1.1).toFixed(2)}
+                      ₵{calculations.finalTotal.toFixed(2)}
                     </span>
                   </div>
 
