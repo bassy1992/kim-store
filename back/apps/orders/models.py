@@ -183,7 +183,7 @@ class Order(models.Model):
         ('cancelled', 'Cancelled'),
     ]
     
-    order_number = models.CharField(max_length=20, unique=True, blank=True)
+    order_number = models.CharField(max_length=50, unique=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='orders')
     email = models.EmailField()
     full_name = models.CharField(max_length=200)
