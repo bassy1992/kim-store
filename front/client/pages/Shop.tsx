@@ -123,35 +123,37 @@ export default function Shop() {
         {/* Filters & Controls */}
         <div className="mb-8 space-y-6">
           {/* Category Pills */}
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="text-sm font-medium text-muted-foreground">Categories:</span>
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => {
-                  const newFilter = cat.toLowerCase() === 'all' ? 'all' : cat.toLowerCase();
-                  setFilterBy(newFilter);
-                  // Update URL params for category filter
-                  const newParams = new URLSearchParams(searchParams);
-                  if (newFilter !== 'all') {
-                    newParams.set('category', newFilter);
-                  } else {
-                    newParams.delete('category');
-                  }
-                  setSearchParams(newParams);
-                }}
-                className={`group relative px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
-                  filterBy === cat.toLowerCase()
-                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25 scale-105"
-                    : "bg-muted/50 hover:bg-muted text-foreground hover:scale-105"
-                }`}
-              >
-                {cat}
-                {filterBy === cat.toLowerCase() && (
-                  <div className="absolute inset-0 rounded-full bg-primary/20 animate-pulse" />
-                )}
-              </button>
-            ))}
+          <div className="space-y-2">
+            <span className="text-sm font-medium text-muted-foreground block md:inline">Categories:</span>
+            <div className="flex overflow-x-auto gap-2 pb-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => {
+                    const newFilter = cat.toLowerCase() === 'all' ? 'all' : cat.toLowerCase();
+                    setFilterBy(newFilter);
+                    // Update URL params for category filter
+                    const newParams = new URLSearchParams(searchParams);
+                    if (newFilter !== 'all') {
+                      newParams.set('category', newFilter);
+                    } else {
+                      newParams.delete('category');
+                    }
+                    setSearchParams(newParams);
+                  }}
+                  className={`group relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap flex-shrink-0 ${
+                    filterBy === cat.toLowerCase()
+                      ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
+                      : "bg-muted/50 hover:bg-muted text-foreground"
+                  }`}
+                >
+                  {cat}
+                  {filterBy === cat.toLowerCase() && (
+                    <div className="absolute inset-0 rounded-full bg-primary/20 animate-pulse" />
+                  )}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Toolbar */}
