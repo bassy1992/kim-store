@@ -33,12 +33,14 @@ export default function Success() {
         
         console.log('Payment verification response:', data);
 
-        if (data.status === 'success') {
+        // Paystack returns: { status: true, data: { status: "success", ... } }
+        if (response.ok && (data.status === true || data.data?.status === 'success')) {
           setVerificationStatus('success');
-          setOrderDetails(data.order);
+          setOrderDetails(data.data || data.order);
           // Clear cart after successful payment
           await clear();
         } else {
+          console.error('Payment verification failed:', data);
           setVerificationStatus('failed');
         }
       } catch (error) {
