@@ -189,22 +189,31 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const updateQuantity = async (id: string, quantity: number) => {
     setLoading(true);
     try {
+      const cartId = localStorage.getItem('cartId');
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      
+      if (cartId) {
+        headers['X-Cart-ID'] = cartId;
+      }
+
       const response = await fetch(`${API_BASE_URL}/cart/items/${id}/`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify({ quantity }),
       });
 
       if (response.ok) {
         await refreshCart();
+      } else if (response.status === 404) {
+        // Item not found - cart might be stale, refresh it
+        console.warn('Cart item not found, refreshing cart...');
+        await refreshCart();
       } else {
-        const error = await response.json();
+        const error = await response.json().catch(() => ({ error: 'Failed to update quantity' }));
         console.error('Failed to update quantity:', error);
-        console.error('Response status:', response.status);
-        console.error('Response headers:', Object.fromEntries(response.headers.entries()));
-        alert(error.error || error.detail || 'Failed to update quantity');
+        throw new Error(error.error || error.detail || 'Failed to update quantity');
       }
     } catch (error) {
       console.error('Failed to update quantity:', error);
@@ -217,14 +226,25 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const remove = async (id: string) => {
     setLoading(true);
     try {
+      const cartId = localStorage.getItem('cartId');
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      
+      if (cartId) {
+        headers['X-Cart-ID'] = cartId;
+      }
+
       const response = await fetch(`${API_BASE_URL}/cart/items/${id}/`, {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
       });
 
       if (response.ok) {
+        await refreshCart();
+      } else if (response.status === 404) {
+        // Item not found - cart might be stale, refresh it
+        console.warn('Cart item not found, refreshing cart...');
         await refreshCart();
       }
     } catch (error) {
@@ -238,11 +258,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const clear = async () => {
     setLoading(true);
     try {
+      const cartId = localStorage.getItem('cartId');
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      
+      if (cartId) {
+        headers['X-Cart-ID'] = cartId;
+      }
+
       const response = await fetch(`${API_BASE_URL}/cart/clear/`, {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
       });
 
       if (response.ok) {
