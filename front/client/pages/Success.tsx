@@ -7,18 +7,24 @@ export default function Success() {
   const [verificationStatus, setVerificationStatus] = useState<'loading' | 'success' | 'failed'>('loading');
   const [orderDetails, setOrderDetails] = useState<any>(null);
   const { clear } = useCart();
+  const [hasVerified, setHasVerified] = useState(false);
 
   useEffect(() => {
+    // Prevent multiple verification attempts
+    if (hasVerified) return;
+    
     const verifyPayment = async () => {
       const reference = searchParams.get('reference');
       
       if (!reference) {
         setVerificationStatus('failed');
+        setHasVerified(true);
         return;
       }
 
       try {
         console.log('Verifying payment with reference:', reference);
+        setHasVerified(true); // Mark as verified immediately to prevent re-runs
         
         // Use Django backend API
         const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
@@ -50,7 +56,7 @@ export default function Success() {
     };
 
     verifyPayment();
-  }, [searchParams, clear]);
+  }, [searchParams, hasVerified]); // Removed 'clear' from dependencies to prevent loop
 
   if (verificationStatus === 'loading') {
     return (
