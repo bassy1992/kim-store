@@ -188,7 +188,7 @@ class Order(models.Model):
     email = models.EmailField()
     full_name = models.CharField(max_length=200)
     shipping_address = models.TextField()
-    phone = models.CharField(max_length=20)
+    phone = models.CharField(max_length=50)  # Increased to support international phone numbers
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     
     # Pricing fields
