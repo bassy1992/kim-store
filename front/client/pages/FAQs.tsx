@@ -47,7 +47,7 @@ export default function FAQs() {
         },
         {
           q: "How do I initiate a return?",
-          a: "Contact our customer service team at hello@kimmysfragrance.com with your order number. We'll provide you with return instructions and a prepaid shipping label if applicable."
+          a: "Contact our customer service team at hello@yayrasfragrance.com with your order number. We'll provide you with return instructions and a prepaid shipping label if applicable."
         },
         {
           q: "When will I receive my refund?",

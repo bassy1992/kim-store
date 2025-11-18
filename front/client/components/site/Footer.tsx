@@ -3,7 +3,7 @@ export default function Footer() {
     <footer className="mt-20 border-t">
       <div className="container py-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-3">
-          <h3 className="font-display text-xl">Kimmy's Fragrance</h3>
+          <h3 className="font-display text-xl">Yayra's Fragrance</h3>
           <p className="text-sm text-muted-foreground max-w-xs">
             Curated niche perfumes crafted to leave a lasting impression.
           </p>
@@ -34,7 +34,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="border-t py-4 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} Kimmy's Fragrance. All rights reserved.
+        © {new Date().getFullYear()} Yayra's Fragrance. All rights reserved.
       </div>
     </footer>
   );

@@ -27,8 +27,8 @@ export default function Header() {
             {open ? <X className="size-5" /> : <Menu className="size-5" />}
           </button>
           <Link to="/" className="flex items-center gap-2">
-            <img src={logoUrl} alt="Kimmy's Fragrance" className="h-10 w-10 rounded-full object-cover" />
-            <span className="hidden sm:inline-block font-display text-xl tracking-tight">Kimmy's Fragrance</span>
+            <img src={logoUrl} alt="Yayra's Fragrance" className="h-10 w-10 rounded-full object-cover" />
+            <span className="hidden sm:inline-block font-display text-xl tracking-tight">Yayra's Fragrance</span>
           </Link>
         </div>
 

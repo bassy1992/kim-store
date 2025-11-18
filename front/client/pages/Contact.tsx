@@ -7,8 +7,8 @@ export default function Contact() {
         </svg>
       ),
       title: "Email",
-      value: "hello@kimmysfragrance.com",
-      link: "mailto:hello@kimmysfragrance.com"
+      value: "hello@yayrasfragrance.com",
+      link: "mailto:hello@yayrasfragrance.com"
     },
     {
       icon: (

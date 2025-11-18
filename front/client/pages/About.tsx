@@ -4,7 +4,7 @@ export default function About() {
       {/* Hero Section */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-secondary via-accent/30 to-primary/10 p-12 md:p-16 mb-16">
         <div className="relative z-10 max-w-3xl">
-          <h1 className="font-display text-4xl md:text-5xl lg:text-6xl mb-6 animate-slide-up">About Kimmy's Fragrance</h1>
+          <h1 className="font-display text-4xl md:text-5xl lg:text-6xl mb-6 animate-slide-up">About Yayra's Fragrance</h1>
           <p className="text-lg text-foreground/80 leading-relaxed animate-slide-up" style={{animationDelay: "100ms"}}>
             Crafting modern, niche perfumes with meticulous attention to quality and storytelling. We blend premium ingredients to create memorable scents that define moments and evoke emotions.
           </p>
@@ -25,7 +25,7 @@ export default function About() {
             </div>
             <h3 className="font-display text-2xl mb-3">Our Story</h3>
             <p className="text-muted-foreground leading-relaxed">
-              Founded in 2025, Kimmy's Fragrance emerged from a passion to create scents that feel deeply personal and timelessly elegant. Each fragrance tells a story, capturing the essence of moments worth remembering.
+              Founded in 2025, Yayra's Fragrance emerged from a passion to create scents that feel deeply personal and timelessly elegant. Each fragrance tells a story, capturing the essence of moments worth remembering.
             </p>
           </div>
         </div>
