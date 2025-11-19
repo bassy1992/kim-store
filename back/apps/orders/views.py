@@ -247,6 +247,11 @@ class CartViewSet(viewsets.ViewSet):
         
         # Check minimum order amount
         cart_subtotal = cart.get_subtotal()
+        print(f"Cart subtotal: {cart_subtotal}, Minimum required: {promo.minimum_order_amount}")
+        print(f"Cart items: {cart.items.count()}")
+        for item in cart.items.all():
+            print(f"  - {item.product_name}: {item.product_price} x {item.quantity} = {item.get_subtotal()}")
+        
         if cart_subtotal < promo.minimum_order_amount:
             return Response(
                 {'error': f'Minimum order amount of ₵{promo.minimum_order_amount} required'},
