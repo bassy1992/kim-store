@@ -1,10 +1,14 @@
 import { useCart } from "@/contexts/CartContext";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Cart() {
-  const { items, remove, total, clear, updateQuantity } = useCart();
+  const { items, remove, total, clear, updateQuantity, promoCode, applyPromoCode, removePromoCode, subtotal, discountAmount } = useCart();
+  const [promoInput, setPromoInput] = useState("");
+  const [applyingPromo, setApplyingPromo] = useState(false);
+  const { toast } = useToast();
 
   // Memoize calculations to prevent recalculation on every render
   const calculations = useMemo(() => {
@@ -193,25 +197,100 @@ export default function Cart() {
                 <div className="bg-card rounded-2xl border p-6 space-y-4">
                   <h2 className="font-display text-2xl font-bold">Order Summary</h2>
                   
+                  {/* Promo Code Section */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Promo Code</label>
+                    {promoCode ? (
+                      <div className="flex items-center justify-between p-3 rounded-lg bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800">
+                        <div className="flex items-center gap-2">
+                          <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <div>
+                            <p className="text-sm font-semibold text-green-700 dark:text-green-300">{promoCode.code}</p>
+                            <p className="text-xs text-green-600 dark:text-green-400">{promoCode.discount_display}</p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={async () => {
+                            await removePromoCode();
+                            toast({
+                              title: "Promo code removed",
+                              duration: 2000,
+                            });
+                          }}
+                          className="text-red-600 hover:text-red-700 text-sm font-medium"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={promoInput}
+                          onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
+                          placeholder="Enter code"
+                          className="flex-1 px-3 py-2 rounded-lg border bg-background text-sm"
+                          disabled={applyingPromo}
+                        />
+                        <button
+                          onClick={async () => {
+                            if (!promoInput.trim()) return;
+                            setApplyingPromo(true);
+                            const result = await applyPromoCode(promoInput.trim());
+                            setApplyingPromo(false);
+                            
+                            if (result.success) {
+                              setPromoInput("");
+                              toast({
+                                title: "Success!",
+                                description: result.message,
+                                duration: 3000,
+                              });
+                            } else {
+                              toast({
+                                title: "Invalid code",
+                                description: result.message,
+                                variant: "destructive",
+                                duration: 3000,
+                              });
+                            }
+                          }}
+                          disabled={applyingPromo || !promoInput.trim()}
+                          className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {applyingPromo ? "..." : "Apply"}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  
                   <div className="space-y-3 py-4 border-y">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Subtotal</span>
-                      <span className="font-medium">₵{calculations.subtotal.toFixed(2)}</span>
+                      <span className="font-medium">₵{subtotal.toFixed(2)}</span>
                     </div>
+                    {discountAmount > 0 && (
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Discount</span>
+                        <span className="font-medium text-green-600">-₵{discountAmount.toFixed(2)}</span>
+                      </div>
+                    )}
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Shipping</span>
                       <span className="font-medium text-green-600">Free</span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Tax (10%)</span>
-                      <span className="font-medium">₵{calculations.tax.toFixed(2)}</span>
+                      <span className="font-medium">₵{(total * 0.1).toFixed(2)}</span>
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between pt-2">
                     <span className="font-display text-lg font-semibold">Total</span>
                     <span className="font-display text-3xl font-bold text-primary">
-                      ₵{calculations.finalTotal.toFixed(2)}
+                      ₵{(total * 1.1).toFixed(2)}
                     </span>
                   </div>
 
