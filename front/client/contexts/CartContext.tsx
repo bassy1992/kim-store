@@ -397,11 +397,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const applyPromoCode = async (code: string): Promise<{ success: boolean; message: string }> => {
     setLoading(true);
     try {
+      const cartId = localStorage.getItem('cartId');
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      
+      if (cartId) {
+        headers['X-Cart-ID'] = cartId;
+      }
+      
       const response = await fetch(`${API_BASE_URL}/cart/apply-promo/`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify({ code: code.trim().toUpperCase() }),
       });
 
@@ -443,11 +450,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const removePromoCode = async () => {
     setLoading(true);
     try {
+      const cartId = localStorage.getItem('cartId');
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      
+      if (cartId) {
+        headers['X-Cart-ID'] = cartId;
+      }
+      
       const response = await fetch(`${API_BASE_URL}/cart/remove-promo/`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
       });
 
       if (response.ok) {
