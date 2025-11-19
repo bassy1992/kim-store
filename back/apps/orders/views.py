@@ -250,13 +250,18 @@ class CartViewSet(viewsets.ViewSet):
             )
         
         # Check minimum order amount
-        cart_subtotal = cart.get_subtotal()
-        print(f"Cart subtotal: {cart_subtotal}, Minimum required: {promo.minimum_order_amount}")
+        from decimal import Decimal
+        cart_subtotal = Decimal(str(cart.get_subtotal()))
+        minimum_required = Decimal(str(promo.minimum_order_amount))
+        
+        print(f"Cart subtotal: {cart_subtotal} (type: {type(cart_subtotal)})")
+        print(f"Minimum required: {minimum_required} (type: {type(minimum_required)})")
+        print(f"Comparison result: {cart_subtotal} < {minimum_required} = {cart_subtotal < minimum_required}")
         print(f"Cart items: {cart.items.count()}")
         for item in cart.items.all():
             print(f"  - {item.product_name}: {item.product_price} x {item.quantity} = {item.get_subtotal()}")
         
-        if cart_subtotal < promo.minimum_order_amount:
+        if cart_subtotal < minimum_required:
             return Response(
                 {'error': f'Minimum order amount of ₵{promo.minimum_order_amount} required'},
                 status=status.HTTP_400_BAD_REQUEST
