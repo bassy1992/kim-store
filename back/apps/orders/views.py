@@ -221,6 +221,10 @@ class CartViewSet(viewsets.ViewSet):
     def apply_promo_code(self, request):
         """Apply promo code to cart"""
         cart = self.get_cart(request)
+        
+        # Ensure cart items are loaded
+        cart.refresh_from_db()
+        
         promo_code = request.data.get('code', '').strip().upper()
         
         if not promo_code:
