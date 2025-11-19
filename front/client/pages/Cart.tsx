@@ -12,14 +12,8 @@ export default function Cart() {
 
   // Memoize calculations to prevent recalculation on every render
   const calculations = useMemo(() => {
-    const subtotal = total;
-    const tax = total * 0.1;
-    const finalTotal = total * 1.1;
-    
     return {
-      subtotal,
-      tax,
-      finalTotal
+      finalTotal: total
     };
   }, [total]);
 
@@ -281,16 +275,12 @@ export default function Cart() {
                       <span className="text-muted-foreground">Shipping</span>
                       <span className="font-medium text-green-600">Free</span>
                     </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Tax (10%)</span>
-                      <span className="font-medium">₵{(total * 0.1).toFixed(2)}</span>
-                    </div>
                   </div>
 
                   <div className="flex items-center justify-between pt-2">
                     <span className="font-display text-lg font-semibold">Total</span>
                     <span className="font-display text-3xl font-bold text-primary">
-                      ₵{(total * 1.1).toFixed(2)}
+                      ₵{total.toFixed(2)}
                     </span>
                   </div>
 
