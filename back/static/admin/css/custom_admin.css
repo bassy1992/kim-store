@@ -1,0 +1,158 @@
+/* Custom CSS for Kim Store Admin */
+
+/* Brand colors */
+:root {
+    --kim-primary: #6f42c1;
+    --kim-secondary: #e83e8c;
+    --kim-accent: #fd7e14;
+    --kim-success: #28a745;
+    --kim-info: #17a2b8;
+    --kim-warning: #ffc107;
+    --kim-danger: #dc3545;
+    --kim-dark: #343a40;
+    --kim-light: #f8f9fa;
+}
+
+/* Custom navbar styling */
+.navbar-dark {
+    background: linear-gradient(135deg, var(--kim-primary) 0%, var(--kim-secondary) 100%) !important;
+}
+
+/* Sidebar enhancements */
+.sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link.active {
+    background-color: var(--kim-accent) !important;
+    color: white !important;
+}
+
+.sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link:hover {
+    background-color: rgba(253, 126, 20, 0.2) !important;
+}
+
+/* Card enhancements */
+.card {
+    border-radius: 10px !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--kim-light) 0%, #e9ecef 100%) !important;
+    border-bottom: 2px solid var(--kim-primary) !important;
+}
+
+/* Button styling */
+.btn-primary {
+    background: linear-gradient(135deg, var(--kim-primary) 0%, var(--kim-secondary) 100%) !important;
+    border: none !important;
+    border-radius: 25px !important;
+    padding: 8px 20px !important;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 15px rgba(111, 66, 193, 0.3) !important;
+}
+
+/* Form enhancements */
+.form-control:focus {
+    border-color: var(--kim-primary) !important;
+    box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25) !important;
+}
+
+/* Table enhancements */
+.table thead th {
+    background: linear-gradient(135deg, var(--kim-primary) 0%, var(--kim-secondary) 100%) !important;
+    color: white !important;
+    border: none !important;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(111, 66, 193, 0.05) !important;
+}
+
+/* Image preview enhancements */
+img[style*="max-width"] {
+    border-radius: 8px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+    transition: transform 0.3s ease !important;
+}
+
+img[style*="max-width"]:hover {
+    transform: scale(1.05) !important;
+}
+
+/* Dashboard stats cards */
+.info-box {
+    border-radius: 10px !important;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.1) !important;
+}
+
+.info-box-icon {
+    border-radius: 10px 0 0 10px !important;
+}
+
+/* Login page enhancements */
+.login-page {
+    background: linear-gradient(135deg, var(--kim-primary) 0%, var(--kim-secondary) 100%) !important;
+}
+
+.login-box {
+    border-radius: 15px !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important;
+}
+
+/* Custom animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.content-wrapper {
+    animation: fadeInUp 0.5s ease-out !important;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.1rem !important;
+    }
+    
+    .btn {
+        padding: 6px 15px !important;
+        font-size: 0.9rem !important;
+    }
+}
+
+/* Custom status badges */
+.badge-success {
+    background: linear-gradient(135deg, var(--kim-success) 0%, #20c997 100%) !important;
+}
+
+.badge-warning {
+    background: linear-gradient(135deg, var(--kim-warning) 0%, #fd7e14 100%) !important;
+}
+
+.badge-danger {
+    background: linear-gradient(135deg, var(--kim-danger) 0%, #e83e8c 100%) !important;
+}
+
+/* Fieldset styling */
+fieldset {
+    border: 2px solid var(--kim-primary) !important;
+    border-radius: 10px !important;
+    padding: 15px !important;
+    margin-bottom: 20px !important;
+}
+
+fieldset legend {
+    background-color: var(--kim-primary) !important;
+    color: white !important;
+    padding: 5px 15px !important;
+    border-radius: 15px !important;
+    font-weight: bold !important;
+}
