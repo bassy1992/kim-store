@@ -3,9 +3,13 @@ nixPkgs = ["python311", "python311Packages.pip", "python311Packages.virtualenv"]
 
 [phases.install]
 cmds = [
-  "python -m venv /opt/venv",
-  "/opt/venv/bin/pip install -r requirements.txt"
+  "python -m venv /app/.venv",
+  "/app/.venv/bin/pip install -r requirements.txt"
 ]
 
+[variables]
+PATH = "/app/.venv/bin:${PATH}"
+PYTHONPATH = "/app"
+
 [start]
-cmd = "/opt/venv/bin/python manage.py migrate && /opt/venv/bin/python manage.py collectstatic --noinput && /opt/venv/bin/python manage.py createsuperuser --noinput || true && /opt/venv/bin/gunicorn config.wsgi --bind 0.0.0.0:$PORT"
+cmd = "python manage.py migrate && python manage.py collectstatic --noinput && python manage.py createsuperuser --noinput || true && gunicorn config.wsgi --bind 0.0.0.0:$PORT"
