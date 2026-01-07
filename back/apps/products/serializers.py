@@ -13,9 +13,12 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class ProductImageSerializer(serializers.ModelSerializer):
     """Serializer for ProductImage model"""
+    url = serializers.CharField(read_only=True)
+    
     class Meta:
         model = ProductImage
-        fields = ['id', 'image_url', 'alt_text', 'is_primary', 'order']
+        fields = ['id', 'image_url', 'image_file', 'url', 'alt_text', 'is_primary', 'order']
+        read_only_fields = ['url']
 
 
 class ProductListSerializer(serializers.ModelSerializer):

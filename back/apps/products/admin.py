@@ -13,14 +13,15 @@ class CategoryAdmin(admin.ModelAdmin):
 class ProductImageInline(admin.TabularInline):
     model = ProductImage
     extra = 1
-    fields = ['image_url', 'alt_text', 'is_primary', 'order', 'image_preview']
+    fields = ['image_file', 'image_url', 'alt_text', 'is_primary', 'order', 'image_preview']
     readonly_fields = ['image_preview']
     
     def image_preview(self, obj):
-        if obj.image_url:
+        url = obj.url if obj.pk else None
+        if url:
             return format_html(
                 '<img src="{}" style="max-width: 100px; max-height: 100px;" />',
-                obj.image_url
+                url
             )
         return "No image"
     image_preview.short_description = "Preview"
@@ -47,16 +48,36 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(ProductImage)
 class ProductImageAdmin(admin.ModelAdmin):
-    list_display = ['product', 'image_preview', 'is_primary', 'order']
+    list_display = ['product', 'image_preview', 'image_source', 'is_primary', 'order']
     list_filter = ['is_primary', 'product']
-    fields = ['product', 'image_url', 'alt_text', 'is_primary', 'order', 'image_preview']
+    fieldsets = [
+        (None, {
+            'fields': ['product', 'alt_text', 'is_primary', 'order']
+        }),
+        ('Image Source (choose one)', {
+            'description': 'Upload a file OR provide a URL. Uploaded files take priority.',
+            'fields': ['image_file', 'image_url']
+        }),
+        ('Preview', {
+            'fields': ['image_preview']
+        }),
+    ]
     readonly_fields = ['image_preview']
     
     def image_preview(self, obj):
-        if obj.image_url:
+        url = obj.url if obj.pk else None
+        if url:
             return format_html(
                 '<img src="{}" style="max-width: 150px; max-height: 150px;" />',
-                obj.image_url
+                url
             )
         return "No image"
     image_preview.short_description = "Preview"
+    
+    def image_source(self, obj):
+        if obj.image_file:
+            return "📁 Uploaded"
+        elif obj.image_url:
+            return "🔗 URL"
+        return "None"
+    image_source.short_description = "Source"

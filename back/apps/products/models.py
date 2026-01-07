@@ -94,10 +94,10 @@ class Product(models.Model):
         """Get the primary product image URL"""
         primary = self.images.filter(is_primary=True).first()
         if primary:
-            return primary.image_url
+            return primary.url
         # Fallback to first image
         first_image = self.images.first()
-        return first_image.image_url if first_image else None
+        return first_image.url if first_image else None
     
     @property
     def average_rating(self):
@@ -114,13 +114,24 @@ class Product(models.Model):
 
 
 class ProductImage(models.Model):
-    """Multiple images for each product using URLs"""
+    """Multiple images for each product - supports both URL and file upload"""
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+    
+    # Option 1: URL-based image
     image_url = models.URLField(
         max_length=500,
-        default='https://via.placeholder.com/300x300?text=No+Image',
-        help_text="URL of the product image (e.g., from CDN, cloud storage, or external source)"
+        blank=True,
+        help_text="URL of the product image (e.g., from CDN or external source)"
     )
+    
+    # Option 2: File upload (uses Cloudinary in production)
+    image_file = models.ImageField(
+        upload_to='products/',
+        blank=True,
+        null=True,
+        help_text="Upload image from your computer"
+    )
+    
     alt_text = models.CharField(
         max_length=200, 
         blank=True,
@@ -134,3 +145,15 @@ class ProductImage(models.Model):
     
     def __str__(self):
         return f"{self.product.name} - Image {self.id}"
+    
+    @property
+    def url(self):
+        """Return the image URL - prioritizes uploaded file over URL field"""
+        if self.image_file:
+            return self.image_file.url
+        return self.image_url or 'https://via.placeholder.com/300x300?text=No+Image'
+    
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        if not self.image_url and not self.image_file:
+            raise ValidationError('Please provide either an image URL or upload an image file.')
