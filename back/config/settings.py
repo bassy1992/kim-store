@@ -81,8 +81,6 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     'drf_spectacular',
-    'storages',
-    'cloudinary',
     
     # Local apps
     'apps.products',
@@ -210,48 +208,10 @@ STATICFILES_DIRS = [
 ]
 
 # WhiteNoise configuration for serving static files
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 # Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-
-# Railway S3-compatible storage settings
-AWS_S3_ENDPOINT_URL = config('AWS_S3_ENDPOINT_URL', default=None)
-AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID', default=None)
-AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY', default=None)
-AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME', default=None)
-AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME', default='auto')
-AWS_S3_SIGNATURE_VERSION = 's3v4'
-AWS_S3_FILE_OVERWRITE = False
-AWS_DEFAULT_ACL = 'public-read'
-AWS_QUERYSTRING_AUTH = False
-
-# Cloudinary settings (for direct API use if needed)
-CLOUDINARY_URL = config('CLOUDINARY_URL', default=None)
-
-# STORAGES config for Django 4.2+ (use this instead of DEFAULT_FILE_STORAGE)
-# Supports both S3 and Cloudinary - access via: from django.core.files.storage import storages
-# Example: storages["s3"], storages["cloudinary"]
-if AWS_S3_ENDPOINT_URL:
-    default_storage_backend = "storages.backends.s3boto3.S3Boto3Storage"
-else:
-    default_storage_backend = "django.core.files.storage.FileSystemStorage"
-
-STORAGES = {
-    "default": {
-        "BACKEND": default_storage_backend,
-    },
-    "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-    },
-}
-
-# Add S3 storage if configured
-if AWS_S3_ENDPOINT_URL:
-    STORAGES["s3"] = {
-        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
-    }
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
