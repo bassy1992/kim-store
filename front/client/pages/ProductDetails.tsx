@@ -33,10 +33,12 @@ export default function ProductDetails() {
   // Filter out current product from related products
   const relatedProducts = relatedData?.results?.filter(p => p.slug !== id).slice(0, 3) || [];
 
-  // Use product images or fallback to default
-  const productImages = product?.primary_image 
-    ? [product.primary_image, product.primary_image, product.primary_image] 
-    : [defaultImage];
+  // Use all product images from the API, fallback to primary_image or default
+  const productImages = product?.images && product.images.length > 0
+    ? product.images.map((img: { url?: string; image_url?: string }) => img.url || img.image_url)
+    : product?.primary_image 
+      ? [product.primary_image] 
+      : [defaultImage];
   
   const image = productImages[imgIndex] || defaultImage;
 
