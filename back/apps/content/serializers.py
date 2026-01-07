@@ -19,11 +19,11 @@ class TestimonialSerializer(serializers.ModelSerializer):
 
 
 class GalleryImageSerializer(serializers.ModelSerializer):
-    url = serializers.ReadOnlyField()
+    image = serializers.ReadOnlyField(source='url')  # Alias for frontend compatibility
     
     class Meta:
         model = GalleryImage
-        fields = ['id', 'title', 'description', 'url', 'image_url', 'category', 'created_at']
+        fields = ['id', 'title', 'description', 'image', 'image_url', 'category', 'created_at']
 
 
 class ShippingInfoSerializer(serializers.ModelSerializer):
@@ -55,11 +55,11 @@ class PrivacyPolicySerializer(serializers.ModelSerializer):
 
 
 class GiftCardSerializer(serializers.ModelSerializer):
-    url = serializers.ReadOnlyField()
+    image = serializers.ReadOnlyField(source='url')  # Alias for frontend compatibility
     
     class Meta:
         model = GiftCard
-        fields = ['id', 'name', 'description', 'amount', 'url', 'image_url', 'is_active']
+        fields = ['id', 'name', 'description', 'amount', 'image', 'image_url', 'is_active']
 
 
 class ContactMessageSerializer(serializers.ModelSerializer):
@@ -79,13 +79,13 @@ class NewsletterSerializer(serializers.ModelSerializer):
 class DupeProductListSerializer(serializers.ModelSerializer):
     savings = serializers.SerializerMethodField()
     savings_percentage = serializers.SerializerMethodField()
-    url = serializers.ReadOnlyField()
+    image = serializers.ReadOnlyField(source='url')  # Alias for frontend compatibility
     
     class Meta:
         model = DupeProduct
         fields = [
             'id', 'slug', 'name', 'price', 'designer_brand', 'designer_fragrance',
-            'designer_price', 'similarity_percentage', 'url', 'image_url', 'is_featured',
+            'designer_price', 'similarity_percentage', 'image', 'image_url', 'is_featured',
             'savings', 'savings_percentage'
         ]
     
@@ -99,14 +99,14 @@ class DupeProductListSerializer(serializers.ModelSerializer):
 class DupeProductDetailSerializer(serializers.ModelSerializer):
     savings = serializers.SerializerMethodField()
     savings_percentage = serializers.SerializerMethodField()
-    url = serializers.ReadOnlyField()
+    image = serializers.ReadOnlyField(source='url')  # Alias for frontend compatibility
     
     class Meta:
         model = DupeProduct
         fields = [
             'id', 'slug', 'name', 'description', 'price', 'designer_brand',
             'designer_fragrance', 'designer_price', 'similarity_percentage',
-            'scent_notes', 'longevity', 'url', 'image_url', 'stock_quantity',
+            'scent_notes', 'longevity', 'image', 'image_url', 'stock_quantity',
             'is_featured', 'created_at', 'savings', 'savings_percentage'
         ]
     
@@ -118,38 +118,38 @@ class DupeProductDetailSerializer(serializers.ModelSerializer):
 
 
 class AirAmbienceListSerializer(serializers.ModelSerializer):
-    url = serializers.ReadOnlyField()
+    image = serializers.ReadOnlyField(source='url')  # Alias for frontend compatibility
     
     class Meta:
         model = AirAmbience
         fields = [
-            'id', 'slug', 'name', 'price', 'product_type', 'url', 'image_url', 
+            'id', 'slug', 'name', 'price', 'product_type', 'image', 'image_url', 
             'is_featured', 'stock_quantity', 'coverage_area', 'duration'
         ]
 
 
 class AirAmbienceDetailSerializer(serializers.ModelSerializer):
-    url = serializers.ReadOnlyField()
+    image = serializers.ReadOnlyField(source='url')  # Alias for frontend compatibility
     
     class Meta:
         model = AirAmbience
         fields = [
             'id', 'slug', 'name', 'description', 'price', 'product_type',
             'scent_notes', 'size_options', 'usage_instructions', 'features',
-            'coverage_area', 'duration', 'url', 'image_url', 'stock_quantity',
+            'coverage_area', 'duration', 'image', 'image_url', 'stock_quantity',
             'is_featured', 'created_at'
         ]
 
 
 class PerfumeOilListSerializer(serializers.ModelSerializer):
     all_notes = serializers.SerializerMethodField()
-    url = serializers.ReadOnlyField()
+    image = serializers.ReadOnlyField(source='url')  # Alias for frontend compatibility
     
     class Meta:
         model = PerfumeOil
         fields = [
             'id', 'slug', 'name', 'price', 'concentration', 'size_options',
-            'longevity', 'scent_family', 'url', 'image_url', 'is_featured', 'stock_quantity',
+            'longevity', 'scent_family', 'image', 'image_url', 'is_featured', 'stock_quantity',
             'all_notes'
         ]
     
@@ -159,14 +159,14 @@ class PerfumeOilListSerializer(serializers.ModelSerializer):
 
 class PerfumeOilDetailSerializer(serializers.ModelSerializer):
     all_notes = serializers.SerializerMethodField()
-    url = serializers.ReadOnlyField()
+    image = serializers.ReadOnlyField(source='url')  # Alias for frontend compatibility
     
     class Meta:
         model = PerfumeOil
         fields = [
             'id', 'slug', 'name', 'description', 'price', 'concentration',
             'size_options', 'longevity', 'top_notes', 'middle_notes', 'base_notes',
-            'scent_family', 'application_tips', 'ingredients', 'url', 'image_url',
+            'scent_family', 'application_tips', 'ingredients', 'image', 'image_url',
             'stock_quantity', 'is_featured', 'is_custom_blend', 'created_at',
             'all_notes'
         ]
