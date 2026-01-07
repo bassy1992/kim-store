@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect, useCallback } from "rea
 
 // Direct connection to Railway - CORS is configured on backend
 const USE_CORS_PROXY = false; // Disabled - using direct connection
-const RAILWAY_API_URL = import.meta.env.VITE_API_URL || 'https://web-production-0b12.up.railway.app/api';
+const RAILWAY_API_URL = import.meta.env.VITE_API_URL || 'https://web-production-46fa5.up.railway.app/api';
 const CORS_PROXY_URL = '/api'; // Vercel serverless function proxy (not used)
 
 const API_BASE_URL = USE_CORS_PROXY ? CORS_PROXY_URL : RAILWAY_API_URL;
