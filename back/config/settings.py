@@ -81,9 +81,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     'drf_spectacular',
-    'cloudinary_storage',
-    'cloudinary',
     'storages',
+    'cloudinary',
     
     # Local apps
     'apps.products',
@@ -228,20 +227,14 @@ AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL = 'public-read'
 AWS_QUERYSTRING_AUTH = False
 
-# Cloudinary settings
+# Cloudinary settings (for direct API use if needed)
 CLOUDINARY_URL = config('CLOUDINARY_URL', default=None)
-if CLOUDINARY_URL:
-    CLOUDINARY_STORAGE = {
-        'CLOUDINARY_URL': CLOUDINARY_URL,
-    }
 
 # STORAGES config for Django 4.2+ (use this instead of DEFAULT_FILE_STORAGE)
 # Supports both S3 and Cloudinary - access via: from django.core.files.storage import storages
 # Example: storages["s3"], storages["cloudinary"]
 if AWS_S3_ENDPOINT_URL:
     default_storage_backend = "storages.backends.s3boto3.S3Boto3Storage"
-elif CLOUDINARY_URL:
-    default_storage_backend = "cloudinary_storage.storage.MediaCloudinaryStorage"
 else:
     default_storage_backend = "django.core.files.storage.FileSystemStorage"
 
@@ -258,12 +251,6 @@ STORAGES = {
 if AWS_S3_ENDPOINT_URL:
     STORAGES["s3"] = {
         "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
-    }
-
-# Add Cloudinary storage if configured
-if CLOUDINARY_URL:
-    STORAGES["cloudinary"] = {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     }
 
 # Default primary key field type
