@@ -83,6 +83,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'cloudinary_storage',
     'cloudinary',
+    'storages',
     
     # Local apps
     'apps.products',
@@ -216,15 +217,45 @@ STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Cloudinary settings for production media storage
-CLOUDINARY_URL = config('CLOUDINARY_URL', default=None)
+# Railway S3-compatible storage settings
+AWS_S3_ENDPOINT_URL = config('AWS_S3_ENDPOINT_URL', default=None)
+AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID', default=None)
+AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY', default=None)
+AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME', default=None)
+AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME', default='auto')
+AWS_S3_SIGNATURE_VERSION = 's3v4'
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = 'public-read'
+AWS_QUERYSTRING_AUTH = False
 
+# Cloudinary settings
+CLOUDINARY_URL = config('CLOUDINARY_URL', default=None)
 if CLOUDINARY_URL:
-    # Use Cloudinary for media storage in production
     CLOUDINARY_STORAGE = {
         'CLOUDINARY_URL': CLOUDINARY_URL,
     }
+
+# Default storage: Railway S3 (set to Cloudinary if you prefer)
+if AWS_S3_ENDPOINT_URL:
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+elif CLOUDINARY_URL:
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+# STORAGES config for Django 4.2+ (allows using both)
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage" if AWS_S3_ENDPOINT_URL else "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+    "s3": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+    },
+    "cloudinary": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
