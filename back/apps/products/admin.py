@@ -15,7 +15,6 @@ class ProductImageInline(admin.StackedInline):
     extra = 1
     fields = [('image_file', 'image_url'), ('alt_text', 'is_primary', 'order'), 'image_preview']
     readonly_fields = ['image_preview']
-    classes = ['collapse']
     
     def image_preview(self, obj):
         url = obj.url if obj.pk else None
