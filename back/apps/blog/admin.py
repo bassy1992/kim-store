@@ -14,7 +14,11 @@ class BlogPostAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('Content', {
-            'fields': ('title', 'slug', 'content', 'excerpt', 'featured_image_url', 'image_preview')
+            'fields': ('title', 'slug', 'content', 'excerpt')
+        }),
+        ('Featured Image - Choose ONE option', {
+            'fields': ('featured_image_file', 'featured_image_url', 'image_preview'),
+            'description': 'Upload an image from your computer OR provide an external URL. Uploaded files take priority.'
         }),
         ('Publishing', {
             'fields': ('author', 'is_published', 'published_at')
@@ -26,10 +30,11 @@ class BlogPostAdmin(admin.ModelAdmin):
     )
     
     def image_preview(self, obj):
-        if obj.featured_image_url:
+        url = obj.featured_image if hasattr(obj, 'featured_image') else obj.featured_image_url
+        if url:
             return format_html(
                 '<img src="{}" style="max-width: 100px; max-height: 100px;" />',
-                obj.featured_image_url
+                url
             )
         return "No image"
     image_preview.short_description = "Image Preview"

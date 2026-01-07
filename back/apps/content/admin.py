@@ -34,13 +34,22 @@ class GalleryImageAdmin(admin.ModelAdmin):
     readonly_fields = ['image_preview']
     ordering = ['order', '-created_at']
     
-    fields = ['title', 'description', 'image_url', 'image_preview', 'category', 'order', 'is_published']
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('title', 'description', 'category', 'order', 'is_published')
+        }),
+        ('Image - Choose ONE option', {
+            'fields': ('image_file', 'image_url', 'image_preview'),
+            'description': 'Upload an image from your computer OR provide an external URL. Uploaded files take priority.'
+        }),
+    )
     
     def image_preview(self, obj):
-        if obj.image_url:
+        url = obj.url if hasattr(obj, 'url') else obj.image_url
+        if url:
             return format_html(
                 '<img src="{}" style="max-width: 100px; max-height: 100px;" />',
-                obj.image_url
+                url
             )
         return "No image"
     image_preview.short_description = "Preview"
@@ -93,13 +102,22 @@ class GiftCardAdmin(admin.ModelAdmin):
     readonly_fields = ['image_preview']
     ordering = ['amount']
     
-    fields = ['name', 'description', 'amount', 'image_url', 'image_preview', 'is_active']
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('name', 'description', 'amount', 'is_active')
+        }),
+        ('Image - Choose ONE option', {
+            'fields': ('image_file', 'image_url', 'image_preview'),
+            'description': 'Upload an image from your computer OR provide an external URL. Uploaded files take priority.'
+        }),
+    )
     
     def image_preview(self, obj):
-        if obj.image_url:
+        url = obj.url if hasattr(obj, 'url') else obj.image_url
+        if url:
             return format_html(
                 '<img src="{}" style="max-width: 80px; max-height: 80px;" />',
-                obj.image_url
+                url
             )
         return "No image"
     image_preview.short_description = "Preview"
@@ -160,7 +178,11 @@ class DupeProductAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('Product Information', {
-            'fields': ('name', 'slug', 'description', 'price', 'image_url', 'image_preview', 'stock_quantity')
+            'fields': ('name', 'slug', 'description', 'price', 'stock_quantity')
+        }),
+        ('Image - Choose ONE option', {
+            'fields': ('image_file', 'image_url', 'image_preview'),
+            'description': 'Upload an image from your computer OR provide an external URL. Uploaded files take priority.'
         }),
         ('Designer Fragrance', {
             'fields': ('designer_brand', 'designer_fragrance', 'designer_price')
@@ -176,10 +198,11 @@ class DupeProductAdmin(admin.ModelAdmin):
     readonly_fields = ['created_at', 'updated_at', 'image_preview']
     
     def image_preview(self, obj):
-        if obj.image_url:
+        url = obj.url if hasattr(obj, 'url') else obj.image_url
+        if url:
             return format_html(
                 '<img src="{}" style="max-width: 80px; max-height: 80px;" />',
-                obj.image_url
+                url
             )
         return "No image"
     image_preview.short_description = "Preview"
@@ -196,7 +219,11 @@ class AirAmbienceAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('Product Information', {
-            'fields': ('name', 'slug', 'description', 'price', 'product_type', 'image_url', 'image_preview')
+            'fields': ('name', 'slug', 'description', 'price', 'product_type')
+        }),
+        ('Image - Choose ONE option', {
+            'fields': ('image_file', 'image_url', 'image_preview'),
+            'description': 'Upload an image from your computer OR provide an external URL. Uploaded files take priority.'
         }),
         ('Product Details', {
             'fields': ('scent_notes', 'size_options', 'usage_instructions', 'features')
@@ -212,10 +239,11 @@ class AirAmbienceAdmin(admin.ModelAdmin):
     readonly_fields = ['created_at', 'updated_at', 'image_preview']
     
     def image_preview(self, obj):
-        if obj.image_url:
+        url = obj.url if hasattr(obj, 'url') else obj.image_url
+        if url:
             return format_html(
                 '<img src="{}" style="max-width: 80px; max-height: 80px;" />',
-                obj.image_url
+                url
             )
         return "No image"
     image_preview.short_description = "Preview"
@@ -231,7 +259,11 @@ class PerfumeOilAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('Product Information', {
-            'fields': ('name', 'slug', 'description', 'price', 'image_url', 'image_preview')
+            'fields': ('name', 'slug', 'description', 'price')
+        }),
+        ('Image - Choose ONE option', {
+            'fields': ('image_file', 'image_url', 'image_preview'),
+            'description': 'Upload an image from your computer OR provide an external URL. Uploaded files take priority.'
         }),
         ('Oil Details', {
             'fields': ('concentration', 'size_options', 'longevity', 'scent_family')
@@ -250,10 +282,11 @@ class PerfumeOilAdmin(admin.ModelAdmin):
     readonly_fields = ['created_at', 'updated_at', 'image_preview']
     
     def image_preview(self, obj):
-        if obj.image_url:
+        url = obj.url if hasattr(obj, 'url') else obj.image_url
+        if url:
             return format_html(
                 '<img src="{}" style="max-width: 80px; max-height: 80px;" />',
-                obj.image_url
+                url
             )
         return "No image"
     image_preview.short_description = "Preview"

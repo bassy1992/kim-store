@@ -42,11 +42,22 @@ class GalleryImage(models.Model):
     """Gallery photos for the gallery page"""
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
+    
+    # Option 1: URL-based image
     image_url = models.URLField(
         max_length=500,
-        default='https://via.placeholder.com/400x300?text=Gallery+Image',
-        help_text="URL of the gallery image"
+        blank=True,
+        help_text="URL of the gallery image (e.g., from CDN or external source)"
     )
+    
+    # Option 2: File upload
+    image_file = models.ImageField(
+        upload_to='gallery/',
+        blank=True,
+        null=True,
+        help_text="Upload image from your computer"
+    )
+    
     category = models.CharField(max_length=100, default='General', help_text="e.g., Products, Events, Behind the Scenes")
     order = models.PositiveIntegerField(default=0)
     is_published = models.BooleanField(default=True)
@@ -57,6 +68,18 @@ class GalleryImage(models.Model):
     
     def __str__(self):
         return self.title
+    
+    @property
+    def url(self):
+        """Return the image URL - prioritizes uploaded file over URL field"""
+        if self.image_file:
+            return self.image_file.url
+        return self.image_url or 'https://via.placeholder.com/400x300?text=Gallery+Image'
+    
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        if not self.image_url and not self.image_file:
+            raise ValidationError('Please provide either an image URL or upload an image file.')
 
 
 class ShippingInfo(models.Model):
@@ -128,11 +151,22 @@ class GiftCard(models.Model):
     name = models.CharField(max_length=200, default="Gift Card")
     description = models.TextField()
     amount = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    # Option 1: URL-based image
     image_url = models.URLField(
         max_length=500,
         blank=True,
-        help_text="URL of the gift card image"
+        help_text="URL of the gift card image (e.g., from CDN or external source)"
     )
+    
+    # Option 2: File upload
+    image_file = models.ImageField(
+        upload_to='giftcards/',
+        blank=True,
+        null=True,
+        help_text="Upload image from your computer"
+    )
+    
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
@@ -141,6 +175,13 @@ class GiftCard(models.Model):
     
     def __str__(self):
         return f"{self.name} - GHS {self.amount}"
+    
+    @property
+    def url(self):
+        """Return the image URL - prioritizes uploaded file over URL field"""
+        if self.image_file:
+            return self.image_file.url
+        return self.image_url or 'https://via.placeholder.com/300x300?text=Gift+Card'
 
 
 class ContactMessage(models.Model):
@@ -200,11 +241,21 @@ class DupeProduct(models.Model):
     scent_notes = models.TextField(help_text="Top, middle, and base notes")
     longevity = models.CharField(max_length=100, default="6-8 hours")
     
+    # Option 1: URL-based image
     image_url = models.URLField(
         max_length=500,
-        default='https://via.placeholder.com/300x300?text=Dupe+Product',
-        help_text="URL of the dupe product image"
+        blank=True,
+        help_text="URL of the dupe product image (e.g., from CDN or external source)"
     )
+    
+    # Option 2: File upload
+    image_file = models.ImageField(
+        upload_to='dupes/',
+        blank=True,
+        null=True,
+        help_text="Upload image from your computer"
+    )
+    
     stock_quantity = models.PositiveIntegerField(default=0)
     is_featured = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -216,6 +267,13 @@ class DupeProduct(models.Model):
     
     def __str__(self):
         return f"{self.name} (Dupe of {self.designer_brand} {self.designer_fragrance})"
+    
+    @property
+    def url(self):
+        """Return the image URL - prioritizes uploaded file over URL field"""
+        if self.image_file:
+            return self.image_file.url
+        return self.image_url or 'https://via.placeholder.com/300x300?text=Dupe+Product'
     
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -260,11 +318,21 @@ class AirAmbience(models.Model):
     coverage_area = models.CharField(max_length=100, blank=True, help_text="e.g., Up to 500 sq ft")
     duration = models.CharField(max_length=100, blank=True, help_text="e.g., Lasts 30 days")
     
+    # Option 1: URL-based image
     image_url = models.URLField(
         max_length=500,
-        default='https://via.placeholder.com/300x300?text=Air+Ambience',
-        help_text="URL of the air ambience product image"
+        blank=True,
+        help_text="URL of the air ambience product image (e.g., from CDN or external source)"
     )
+    
+    # Option 2: File upload
+    image_file = models.ImageField(
+        upload_to='air_ambience/',
+        blank=True,
+        null=True,
+        help_text="Upload image from your computer"
+    )
+    
     stock_quantity = models.PositiveIntegerField(default=0)
     is_featured = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -278,6 +346,13 @@ class AirAmbience(models.Model):
     
     def __str__(self):
         return f"{self.name} ({self.get_product_type_display()})"
+    
+    @property
+    def url(self):
+        """Return the image URL - prioritizes uploaded file over URL field"""
+        if self.image_file:
+            return self.image_file.url
+        return self.image_url or 'https://via.placeholder.com/300x300?text=Air+Ambience'
     
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -321,11 +396,21 @@ class PerfumeOil(models.Model):
     application_tips = models.TextField(blank=True, help_text="How to apply and use")
     ingredients = models.TextField(blank=True, help_text="Key ingredients and benefits")
     
+    # Option 1: URL-based image
     image_url = models.URLField(
         max_length=500,
-        default='https://via.placeholder.com/300x300?text=Perfume+Oil',
-        help_text="URL of the perfume oil image"
+        blank=True,
+        help_text="URL of the perfume oil image (e.g., from CDN or external source)"
     )
+    
+    # Option 2: File upload
+    image_file = models.ImageField(
+        upload_to='perfume_oils/',
+        blank=True,
+        null=True,
+        help_text="Upload image from your computer"
+    )
+    
     stock_quantity = models.PositiveIntegerField(default=0)
     is_featured = models.BooleanField(default=False)
     is_custom_blend = models.BooleanField(default=False, help_text="Available for custom blending")
@@ -340,6 +425,13 @@ class PerfumeOil(models.Model):
     
     def __str__(self):
         return f"{self.name} ({self.get_concentration_display()})"
+    
+    @property
+    def url(self):
+        """Return the image URL - prioritizes uploaded file over URL field"""
+        if self.image_file:
+            return self.image_file.url
+        return self.image_url or 'https://via.placeholder.com/300x300?text=Perfume+Oil'
     
     def save(self, *args, **kwargs):
         if not self.slug:

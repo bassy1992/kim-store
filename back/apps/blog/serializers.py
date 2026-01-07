@@ -5,12 +5,13 @@ from .models import BlogPost
 class BlogPostListSerializer(serializers.ModelSerializer):
     """Lightweight serializer for blog post list views"""
     author_name = serializers.CharField(source='author.get_full_name', read_only=True)
+    featured_image = serializers.ReadOnlyField()
     
     class Meta:
         model = BlogPost
         fields = [
             'id', 'title', 'slug', 'excerpt', 'author_name',
-            'featured_image_url', 'published_at', 'created_at'
+            'featured_image', 'featured_image_url', 'published_at', 'created_at'
         ]
 
 
@@ -18,12 +19,13 @@ class BlogPostDetailSerializer(serializers.ModelSerializer):
     """Complete serializer for blog post detail views"""
     author_name = serializers.CharField(source='author.get_full_name', read_only=True)
     author_username = serializers.CharField(source='author.username', read_only=True)
+    featured_image = serializers.ReadOnlyField()
     
     class Meta:
         model = BlogPost
         fields = [
             'id', 'title', 'slug', 'content', 'excerpt',
-            'author_name', 'author_username', 'featured_image_url',
+            'author_name', 'author_username', 'featured_image', 'featured_image_url',
             'is_published', 'published_at', 'created_at', 'updated_at'
         ]
         read_only_fields = ['slug', 'created_at', 'updated_at']
@@ -34,6 +36,6 @@ class BlogPostCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = BlogPost
         fields = [
-            'title', 'content', 'excerpt', 'featured_image_url',
+            'title', 'content', 'excerpt', 'featured_image_url', 'featured_image_file',
             'is_published', 'published_at'
         ]
