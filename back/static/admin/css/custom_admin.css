@@ -134,28 +134,25 @@ img[style*="max-width"]:hover {
 .inline-group .inline-related {
     background: #fff !important;
     border: 1px solid #e0e0e0 !important;
-    border-radius: 12px !important;
-    margin-bottom: 20px !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
+    border-radius: 8px !important;
+    margin-bottom: 10px !important;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06) !important;
     overflow: hidden !important;
 }
 
 /* Inline header (Image title + delete) */
 .inline-group .inline-related h3 {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
-    padding: 12px 15px !important;
+    background: #f5f5f5 !important;
+    padding: 8px 12px !important;
     margin: 0 !important;
     border-bottom: 1px solid #e0e0e0 !important;
-    font-size: 14px !important;
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
+    font-size: 12px !important;
 }
 
 /* Inline fieldset content */
 .inline-group .inline-related fieldset {
     border: none !important;
-    padding: 20px !important;
+    padding: 12px !important;
     margin: 0 !important;
     border-radius: 0 !important;
 }
@@ -164,8 +161,8 @@ img[style*="max-width"]:hover {
 .inline-group .inline-related .form-row {
     display: flex !important;
     flex-wrap: wrap !important;
-    gap: 15px !important;
-    margin-bottom: 15px !important;
+    gap: 10px !important;
+    margin-bottom: 8px !important;
     padding: 0 !important;
     border: none !important;
     background: none !important;
@@ -174,24 +171,24 @@ img[style*="max-width"]:hover {
 /* Individual field containers */
 .inline-group .inline-related .form-row > div,
 .inline-group .inline-related .form-row .field-box {
-    flex: 1 1 200px !important;
-    min-width: 150px !important;
+    flex: 1 1 150px !important;
+    min-width: 120px !important;
 }
 
 /* Labels */
 .inline-group .inline-related label {
     display: block !important;
     font-weight: 600 !important;
-    color: var(--kim-primary) !important;
-    margin-bottom: 5px !important;
-    font-size: 13px !important;
+    color: #555 !important;
+    margin-bottom: 3px !important;
+    font-size: 11px !important;
 }
 
 /* Help text */
 .inline-group .inline-related .help {
-    font-size: 11px !important;
-    color: #888 !important;
-    margin-top: 4px !important;
+    font-size: 10px !important;
+    color: #999 !important;
+    margin-top: 2px !important;
 }
 
 /* Input fields */
@@ -200,113 +197,68 @@ img[style*="max-width"]:hover {
 .inline-group .inline-related input[type="number"],
 .inline-group .inline-related select {
     width: 100% !important;
-    padding: 10px 12px !important;
+    padding: 6px 8px !important;
     border: 1px solid #ddd !important;
-    border-radius: 8px !important;
-    font-size: 14px !important;
-    transition: border-color 0.3s, box-shadow 0.3s !important;
-}
-
-.inline-group .inline-related input:focus,
-.inline-group .inline-related select:focus {
-    border-color: var(--kim-primary) !important;
-    box-shadow: 0 0 0 3px rgba(111, 66, 193, 0.15) !important;
-    outline: none !important;
+    border-radius: 4px !important;
+    font-size: 12px !important;
 }
 
 /* File input styling */
 .inline-group .inline-related input[type="file"] {
-    padding: 8px !important;
-    border: 2px dashed #ddd !important;
-    border-radius: 8px !important;
+    padding: 4px !important;
+    border: 1px dashed #ccc !important;
+    border-radius: 4px !important;
     background: #fafafa !important;
     width: 100% !important;
-    cursor: pointer !important;
-}
-
-.inline-group .inline-related input[type="file"]:hover {
-    border-color: var(--kim-primary) !important;
-    background: #f5f0ff !important;
+    font-size: 11px !important;
 }
 
 /* Checkbox styling */
 .inline-group .inline-related input[type="checkbox"] {
-    width: 20px !important;
-    height: 20px !important;
-    cursor: pointer !important;
-    accent-color: var(--kim-primary) !important;
+    width: 16px !important;
+    height: 16px !important;
 }
 
-/* Image preview card */
+/* Image preview */
 .inline-group .inline-related .field-image_preview,
 .inline-group .inline-related .readonly {
-    background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%) !important;
-    padding: 15px !important;
-    border-radius: 10px !important;
-    border: 1px solid #eee !important;
+    background: #f9f9f9 !important;
+    padding: 8px !important;
+    border-radius: 6px !important;
     text-align: center !important;
 }
 
 .inline-group .inline-related .field-image_preview img,
 .inline-group .inline-related .readonly img {
-    border-radius: 10px !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-    max-width: 200px !important;
-    max-height: 200px !important;
-}
-
-/* Current file display */
-.inline-group .inline-related .file-upload .clearable-file-input {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 8px !important;
-}
-
-.inline-group .inline-related .file-upload a {
-    color: var(--kim-primary) !important;
-    word-break: break-all !important;
-}
-
-/* Delete checkbox area */
-.inline-group .inline-related .inline_label {
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
+    border-radius: 6px !important;
+    max-width: 100px !important;
+    max-height: 100px !important;
 }
 
 /* Add another button */
 .inline-group .add-row {
-    padding: 15px !important;
+    padding: 10px !important;
     text-align: center !important;
 }
 
 .inline-group .add-row a {
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    padding: 12px 24px !important;
-    background: linear-gradient(135deg, var(--kim-primary) 0%, var(--kim-secondary) 100%) !important;
+    padding: 8px 16px !important;
+    background: var(--kim-primary) !important;
     color: white !important;
-    border-radius: 25px !important;
+    border-radius: 20px !important;
     text-decoration: none !important;
+    font-size: 12px !important;
     font-weight: 600 !important;
-    transition: all 0.3s ease !important;
-}
-
-.inline-group .add-row a:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 20px rgba(111, 66, 193, 0.35) !important;
 }
 
 /* Inline group header */
 .inline-group h2 {
-    background: linear-gradient(135deg, var(--kim-primary) 0%, var(--kim-secondary) 100%) !important;
+    background: var(--kim-primary) !important;
     color: white !important;
-    padding: 15px 20px !important;
-    border-radius: 10px 10px 0 0 !important;
+    padding: 10px 15px !important;
+    border-radius: 6px 6px 0 0 !important;
     margin: 0 !important;
-    font-size: 16px !important;
-    font-weight: 600 !important;
+    font-size: 14px !important;
 }
 
 /* Mobile responsive */
@@ -315,20 +267,8 @@ img[style*="max-width"]:hover {
         flex-direction: column !important;
     }
     
-    .inline-group .inline-related .form-row > div,
-    .inline-group .inline-related .form-row .field-box {
-        flex: 1 1 100% !important;
-        min-width: 100% !important;
-    }
-    
     .inline-group .inline-related fieldset {
-        padding: 15px !important;
-    }
-    
-    .inline-group .inline-related .field-image_preview img,
-    .inline-group .inline-related .readonly img {
-        max-width: 150px !important;
-        max-height: 150px !important;
+        padding: 10px !important;
     }
 }
 
