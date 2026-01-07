@@ -235,27 +235,36 @@ if CLOUDINARY_URL:
         'CLOUDINARY_URL': CLOUDINARY_URL,
     }
 
-# Default storage: Railway S3 (set to Cloudinary if you prefer)
+# STORAGES config for Django 4.2+ (use this instead of DEFAULT_FILE_STORAGE)
+# Supports both S3 and Cloudinary - access via: from django.core.files.storage import storages
+# Example: storages["s3"], storages["cloudinary"]
 if AWS_S3_ENDPOINT_URL:
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    default_storage_backend = "storages.backends.s3boto3.S3Boto3Storage"
 elif CLOUDINARY_URL:
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    default_storage_backend = "cloudinary_storage.storage.MediaCloudinaryStorage"
+else:
+    default_storage_backend = "django.core.files.storage.FileSystemStorage"
 
-# STORAGES config for Django 4.2+ (allows using both)
 STORAGES = {
     "default": {
-        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage" if AWS_S3_ENDPOINT_URL else "django.core.files.storage.FileSystemStorage",
+        "BACKEND": default_storage_backend,
     },
     "staticfiles": {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
-    "s3": {
-        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
-    },
-    "cloudinary": {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-    },
 }
+
+# Add S3 storage if configured
+if AWS_S3_ENDPOINT_URL:
+    STORAGES["s3"] = {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+    }
+
+# Add Cloudinary storage if configured
+if CLOUDINARY_URL:
+    STORAGES["cloudinary"] = {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    }
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
