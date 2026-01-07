@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Loading Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
+        .test-image {
+            width: 300px;
+            height: 200px;
+            object-fit: cover;
+            margin: 10px;
+            border: 1px solid #ccc;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        #console-log {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #333;
+            padding-left: 10px;
+        }
+        .log-error {
+            border-left-color: red;
+            background: #ffe6e6;
+        }
+        .log-success {
+            border-left-color: green;
+            background: #e6ffe6;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Image Loading Diagnostic Test</h1>
+    <p>Testing image loading from your Vercel deployment</p>
+
+    <div id="console-log">
+        <strong>Console Log:</strong>
+        <div id="log-entries"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 1: Direct Image Load</h2>
+        <p>Testing if images load with standard img tag:</p>
+        <img 
+            src="https://images.unsplash.com/photo-1541643600914-78b084683601?q=80&w=800&auto=format&fit=crop"
+            alt="Test Image 1"
+            class="test-image"
+            id="test1"
+        />
+        <div id="test1-status">Loading...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: Lazy Loading Attribute</h2>
+        <p>Testing native lazy loading support:</p>
+        <img 
+            src="https://images.unsplash.com/photo-1563170351-be82bc888aa4?q=80&w=800&auto=format&fit=crop"
+            alt="Test Image 2"
+            class="test-image"
+            loading="lazy"
+            id="test2"
+        />
+        <div id="test2-status">Loading...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: Fetch from Vercel Deployment</h2>
+        <p>Testing if we can fetch data from your deployment:</p>
+        <div id="test3-status">Testing...</div>
+        <pre id="test3-data"></pre>
+    </div>
+
+    <div class="test-section">
+        <h2>Browser Information</h2>
+        <div id="browser-info"></div>
+    </div>
+
+    <script>
+        const logEntries = document.getElementById('log-entries');
+        
+        function log(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type === 'error' ? 'log-error' : type === 'success' ? 'log-success' : ''}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logEntries.appendChild(entry);
+            console.log(message);
+        }
+
+        // Test 1: Direct Image Load
+        const test1 = document.getElementById('test1');
+        test1.onload = () => {
+            document.getElementById('test1-status').innerHTML = '<span class="success">✅ Image loaded successfully</span>';
+            log('Test 1: Image loaded successfully', 'success');
+        };
+        test1.onerror = (e) => {
+            document.getElementById('test1-status').innerHTML = '<span class="error">❌ Image failed to load</span>';
+            log('Test 1: Image failed to load - ' + e.message, 'error');
+        };
+
+        // Test 2: Lazy Loading
+        const test2 = document.getElementById('test2');
+        test2.onload = () => {
+            document.getElementById('test2-status').innerHTML = '<span class="success">✅ Lazy loading works</span>';
+            log('Test 2: Lazy loading successful', 'success');
+        };
+        test2.onerror = (e) => {
+            document.getElementById('test2-status').innerHTML = '<span class="error">❌ Lazy loading failed</span>';
+            log('Test 2: Lazy loading failed - ' + e.message, 'error');
+        };
+
+        // Test 3: Fetch from Vercel
+        async function testVercelDeployment() {
+            const url = 'https://kimmy-j6w4bakkk-bassys-projects-fca17413.vercel.app';
+            try {
+                log('Test 3: Fetching from Vercel deployment...');
+                const response = await fetch(url, { method: 'HEAD' });
+                if (response.ok) {
+                    document.getElementById('test3-status').innerHTML = '<span class="success">✅ Vercel deployment is accessible</span>';
+                    document.getElementById('test3-data').textContent = `Status: ${response.status}\nHeaders: ${JSON.stringify([...response.headers.entries()], null, 2)}`;
+                    log('Test 3: Vercel deployment accessible', 'success');
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                document.getElementById('test3-status').innerHTML = '<span class="error">❌ Cannot reach Vercel deployment</span>';
+                document.getElementById('test3-data').textContent = error.message;
+                log('Test 3: Failed to reach Vercel - ' + error.message, 'error');
+            }
+        }
+        testVercelDeployment();
+
+        // Browser Info
+        const browserInfo = document.getElementById('browser-info');
+        const info = {
+            'User Agent': navigator.userAgent,
+            'Platform': navigator.platform,
+            'Language': navigator.language,
+            'Online': navigator.onLine,
+            'Cookies Enabled': navigator.cookieEnabled,
+            'Lazy Loading Support': 'loading' in HTMLImageElement.prototype ? '✅ Yes' : '❌ No',
+            'Intersection Observer': 'IntersectionObserver' in window ? '✅ Yes' : '❌ No',
+            'Screen Size': `${window.screen.width}x${window.screen.height}`,
+            'Viewport Size': `${window.innerWidth}x${window.innerHeight}`
+        };
+        
+        browserInfo.innerHTML = Object.entries(info)
+            .map(([key, value]) => `<strong>${key}:</strong> ${value}`)
+            .join('<br>');
+
+        log('Browser info collected');
+        log(`Lazy loading support: ${'loading' in HTMLImageElement.prototype ? 'YES' : 'NO'}`);
+        log(`Intersection Observer support: ${'IntersectionObserver' in window ? 'YES' : 'NO'}`);
+
+        // Monitor all image loads on page
+        window.addEventListener('error', (e) => {
+            if (e.target.tagName === 'IMG') {
+                log(`Image error: ${e.target.src}`, 'error');
+            }
+        }, true);
+
+        // Check if images are blocked
+        setTimeout(() => {
+            const allImages = document.querySelectorAll('img');
+            allImages.forEach((img, index) => {
+                if (!img.complete) {
+                    log(`Image ${index + 1} still loading after 5s: ${img.src}`, 'error');
+                } else if (img.naturalHeight === 0) {
+                    log(`Image ${index + 1} loaded but has no height: ${img.src}`, 'error');
+                }
+            });
+        }, 5000);
+    </script>
+</body>
+</html>
