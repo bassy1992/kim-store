@@ -236,6 +236,21 @@ class DupeProduct(models.Model):
     designer_fragrance = models.CharField(max_length=200, help_text="e.g., Coco Mademoiselle")
     designer_price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Original designer price")
     
+    # Designer fragrance image - Option 1: URL-based
+    designer_image_url = models.URLField(
+        max_length=500,
+        blank=True,
+        help_text="URL of the designer fragrance image (e.g., from CDN or external source)"
+    )
+    
+    # Designer fragrance image - Option 2: File upload
+    designer_image_file = models.ImageField(
+        upload_to='designer_fragrances/',
+        blank=True,
+        null=True,
+        help_text="Upload designer fragrance image from your computer"
+    )
+    
     # Comparison details
     similarity_percentage = models.PositiveSmallIntegerField(default=90, help_text="Similarity to original (0-100%)")
     scent_notes = models.TextField(help_text="Top, middle, and base notes")
@@ -273,6 +288,14 @@ class DupeProduct(models.Model):
         """Return the image URL - prioritizes uploaded file over URL field"""
         if self.image_file:
             return self.image_file.url
+        return self.image_url or 'https://via.placeholder.com/300x300?text=Dupe+Product'
+    
+    @property
+    def designer_image(self):
+        """Return the designer fragrance image URL - prioritizes uploaded file over URL field"""
+        if self.designer_image_file:
+            return self.designer_image_file.url
+        return self.designer_image_url or 'https://via.placeholder.com/300x300?text=Designer+Fragrance'
         return self.image_url or 'https://via.placeholder.com/300x300?text=Dupe+Product'
     
     def save(self, *args, **kwargs):

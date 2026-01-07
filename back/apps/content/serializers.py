@@ -80,12 +80,13 @@ class DupeProductListSerializer(serializers.ModelSerializer):
     savings = serializers.SerializerMethodField()
     savings_percentage = serializers.SerializerMethodField()
     image = serializers.ReadOnlyField(source='url')  # Alias for frontend compatibility
+    designer_image = serializers.ReadOnlyField()  # Designer fragrance image
     
     class Meta:
         model = DupeProduct
         fields = [
             'id', 'slug', 'name', 'price', 'designer_brand', 'designer_fragrance',
-            'designer_price', 'similarity_percentage', 'image', 'image_url', 'is_featured',
+            'designer_price', 'designer_image', 'similarity_percentage', 'image', 'image_url', 'is_featured',
             'savings', 'savings_percentage'
         ]
     
@@ -100,12 +101,13 @@ class DupeProductDetailSerializer(serializers.ModelSerializer):
     savings = serializers.SerializerMethodField()
     savings_percentage = serializers.SerializerMethodField()
     image = serializers.ReadOnlyField(source='url')  # Alias for frontend compatibility
+    designer_image = serializers.ReadOnlyField()  # Designer fragrance image
     
     class Meta:
         model = DupeProduct
         fields = [
             'id', 'slug', 'name', 'description', 'price', 'designer_brand',
-            'designer_fragrance', 'designer_price', 'similarity_percentage',
+            'designer_fragrance', 'designer_price', 'designer_image', 'similarity_percentage',
             'scent_notes', 'longevity', 'image', 'image_url', 'stock_quantity',
             'is_featured', 'created_at', 'savings', 'savings_percentage'
         ]

@@ -180,12 +180,16 @@ class DupeProductAdmin(admin.ModelAdmin):
         ('Product Information', {
             'fields': ('name', 'slug', 'description', 'price', 'stock_quantity')
         }),
-        ('Image - Choose ONE option', {
+        ('Our Dupe Image - Choose ONE option', {
             'fields': ('image_file', 'image_url', 'image_preview'),
             'description': 'Upload an image from your computer OR provide an external URL. Uploaded files take priority.'
         }),
         ('Designer Fragrance', {
             'fields': ('designer_brand', 'designer_fragrance', 'designer_price')
+        }),
+        ('Designer Fragrance Image - Choose ONE option', {
+            'fields': ('designer_image_file', 'designer_image_url', 'designer_image_preview'),
+            'description': 'Upload the designer fragrance image OR provide an external URL. Uploaded files take priority.'
         }),
         ('Comparison Details', {
             'fields': ('similarity_percentage', 'scent_notes', 'longevity')
@@ -195,7 +199,7 @@ class DupeProductAdmin(admin.ModelAdmin):
         }),
     )
     
-    readonly_fields = ['created_at', 'updated_at', 'image_preview']
+    readonly_fields = ['created_at', 'updated_at', 'image_preview', 'designer_image_preview']
     
     def image_preview(self, obj):
         url = obj.url if hasattr(obj, 'url') else obj.image_url
@@ -205,7 +209,17 @@ class DupeProductAdmin(admin.ModelAdmin):
                 url
             )
         return "No image"
-    image_preview.short_description = "Preview"
+    image_preview.short_description = "Our Dupe Preview"
+    
+    def designer_image_preview(self, obj):
+        url = obj.designer_image if hasattr(obj, 'designer_image') else obj.designer_image_url
+        if url:
+            return format_html(
+                '<img src="{}" style="max-width: 80px; max-height: 80px;" />',
+                url
+            )
+        return "No image"
+    designer_image_preview.short_description = "Designer Preview"
 
 
 @admin.register(AirAmbience)
