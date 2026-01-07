@@ -222,8 +222,10 @@ AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME', default=None)
 AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME', default='auto')
 AWS_S3_SIGNATURE_VERSION = 's3v4'
 AWS_S3_FILE_OVERWRITE = False
-AWS_DEFAULT_ACL = 'public-read'
-AWS_QUERYSTRING_AUTH = False
+AWS_DEFAULT_ACL = None  # Don't set ACL - use bucket policy
+AWS_QUERYSTRING_AUTH = True  # Use signed URLs for private bucket
+AWS_S3_URL_PROTOCOL = 'https:'
+AWS_QUERYSTRING_EXPIRE = 3600  # URLs expire in 1 hour
 
 # Use S3 for media storage if configured
 if AWS_S3_ENDPOINT_URL:
