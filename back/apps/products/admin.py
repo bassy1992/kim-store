@@ -10,17 +10,18 @@ class CategoryAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
 
 
-class ProductImageInline(admin.TabularInline):
+class ProductImageInline(admin.StackedInline):
     model = ProductImage
     extra = 1
-    fields = ['image_file', 'image_url', 'alt_text', 'is_primary', 'order', 'image_preview']
+    fields = [('image_file', 'image_url'), ('alt_text', 'is_primary', 'order'), 'image_preview']
     readonly_fields = ['image_preview']
+    classes = ['collapse']
     
     def image_preview(self, obj):
         url = obj.url if obj.pk else None
         if url:
             return format_html(
-                '<img src="{}" style="max-width: 100px; max-height: 100px;" />',
+                '<img src="{}" style="max-width: 150px; max-height: 150px; border-radius: 8px;" />',
                 url
             )
         return "No image"
