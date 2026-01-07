@@ -81,6 +81,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     'drf_spectacular',
+    'cloudinary_storage',
+    'cloudinary',
     
     # Local apps
     'apps.products',
@@ -213,6 +215,16 @@ STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 # Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Cloudinary settings for production media storage
+CLOUDINARY_URL = config('CLOUDINARY_URL', default=None)
+
+if CLOUDINARY_URL:
+    # Use Cloudinary for media storage in production
+    CLOUDINARY_STORAGE = {
+        'CLOUDINARY_URL': CLOUDINARY_URL,
+    }
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
