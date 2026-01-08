@@ -55,7 +55,7 @@ export default function ProductDetails() {
   // Loading state
   if (isLoading) {
     return (
-      <main className="container py-16">
+      <main className="container px-4 py-8 md:py-16">
         <div className="flex flex-col items-center justify-center py-24">
           <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
           <p className="mt-6 text-muted-foreground">Loading product...</p>
@@ -67,9 +67,9 @@ export default function ProductDetails() {
   // Error state
   if (error || !product) {
     return (
-      <main className="container py-16">
+      <main className="container px-4 py-8 md:py-16">
         <div className="text-center py-24">
-          <h2 className="font-display text-3xl font-bold mb-4">Product Not Found</h2>
+          <h2 className="font-display text-2xl md:text-3xl font-bold mb-4">Product Not Found</h2>
           <p className="text-muted-foreground mb-6">The product you're looking for doesn't exist.</p>
           <Link to="/shop" className="inline-block px-6 py-3 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90">
             Back to Shop
@@ -80,20 +80,24 @@ export default function ProductDetails() {
   }
 
   return (
-    <main className="container py-16 animate-fade-in">
-      <div className="grid gap-8 lg:grid-cols-2">
+    <main className="container px-4 py-8 md:py-16 animate-fade-in">
+      <div className="grid gap-6 md:gap-8 lg:grid-cols-2">
         {/* Gallery */}
-        <div>
-          <div className="overflow-hidden rounded-2xl border shadow-lg animate-scale-in">
-            <img src={image} alt={product.name} className="w-full h-72 sm:h-96 md:h-[420px] lg:h-[520px] object-cover transition-transform duration-500" />
+        <div className="w-full">
+          <div className="overflow-hidden rounded-xl md:rounded-2xl border shadow-lg animate-scale-in">
+            <img 
+              src={image} 
+              alt={product.name} 
+              className="w-full h-64 sm:h-80 md:h-96 lg:h-[480px] object-cover transition-transform duration-500" 
+            />
           </div>
 
-          <div className="mt-4 flex gap-3 overflow-x-auto py-1">
+          <div className="mt-3 md:mt-4 flex gap-2 md:gap-3 overflow-x-auto py-1 -mx-1 px-1">
             {productImages.map((src, i) => (
               <button
                 key={i}
                 onClick={() => setImgIndex(i)}
-                className={`min-w-[72px] h-20 overflow-hidden rounded-lg border transition-transform duration-200 ${i === imgIndex ? "ring-2 ring-primary scale-105" : "opacity-80 hover:opacity-100 hover:scale-105"}`}
+                className={`flex-shrink-0 w-16 h-16 md:w-20 md:h-20 overflow-hidden rounded-lg border transition-transform duration-200 ${i === imgIndex ? "ring-2 ring-primary scale-105" : "opacity-80 hover:opacity-100 hover:scale-105"}`}
               >
                 <img src={src} alt={`${product.name} ${i + 1}`} className="h-full w-full object-cover" />
               </button>
@@ -103,35 +107,39 @@ export default function ProductDetails() {
 
         {/* Details */}
         <div className="space-y-4 animate-slide-up">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <Link to="/shop" className="text-sm text-muted-foreground hover:text-primary">Shop</Link>
             <span className="text-muted-foreground">/</span>
-            <span className="text-sm text-muted-foreground">{product.category?.name || 'Products'}</span>
+            <span className="text-sm text-muted-foreground truncate">{product.category?.name || 'Products'}</span>
           </div>
           
-          <h1 className="font-display text-3xl">{product.name}</h1>
+          <h1 className="font-display text-2xl md:text-3xl">{product.name}</h1>
           
-          <div className="flex items-center gap-4">
-            <div className="text-2xl font-semibold">₵{parseFloat(product.price).toFixed(2)}</div>
+          <div className="flex flex-wrap items-center gap-3 md:gap-4">
+            <div className="text-xl md:text-2xl font-semibold">₵{parseFloat(product.price).toFixed(2)}</div>
             {product.stock_quantity > 0 ? (
-              <span className="text-sm text-green-600 font-medium">In Stock ({product.stock_quantity} available)</span>
+              <span className="text-xs md:text-sm text-green-600 font-medium">In Stock ({product.stock_quantity})</span>
             ) : (
-              <span className="text-sm text-red-600 font-medium">Out of Stock</span>
+              <span className="text-xs md:text-sm text-red-600 font-medium">Out of Stock</span>
             )}
           </div>
 
           {product.tag && (
-            <div className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
+            <div className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-xs md:text-sm font-medium">
               {product.tag}
             </div>
           )}
 
-          <p className="text-muted-foreground">{product.description || "A refined composition blending floral and woody accords with excellent longevity."}</p>
+          <p className="text-sm md:text-base text-muted-foreground">{product.description || "A refined composition blending floral and woody accords with excellent longevity."}</p>
 
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3 mt-4">
-            <div>
-              <label className="text-sm text-muted-foreground">Size</label>
-              <select value={size} onChange={(e) => setSize(e.target.value)} className="ml-2 rounded-md border px-3 py-2 transition-shadow hover:shadow-sm">
+          <div className="flex flex-col gap-3 mt-4">
+            <div className="flex items-center gap-2">
+              <label className="text-sm text-muted-foreground min-w-[50px]">Size</label>
+              <select 
+                value={size} 
+                onChange={(e) => setSize(e.target.value)} 
+                className="flex-1 max-w-[150px] rounded-md border px-3 py-2 text-sm transition-shadow hover:shadow-sm"
+              >
                 {sizeOptions.map((sizeOption) => (
                   <option key={sizeOption} value={sizeOption}>{sizeOption}</option>
                 ))}
@@ -139,18 +147,28 @@ export default function ProductDetails() {
             </div>
 
             <div className="flex items-center gap-2">
-              <label className="text-sm text-muted-foreground">Quantity</label>
-              <div className="ml-2 flex items-center gap-2">
-                <button className="rounded-md border px-3 py-1 hover:bg-muted" onClick={() => setQty((q) => Math.max(1, q - 1))}>-</button>
-                <div className="w-10 text-center">{qty}</div>
-                <button className="rounded-md border px-3 py-1 hover:bg-muted" onClick={() => setQty((q) => q + 1)}>+</button>
+              <label className="text-sm text-muted-foreground min-w-[50px]">Qty</label>
+              <div className="flex items-center gap-2">
+                <button 
+                  className="rounded-md border px-3 py-1.5 hover:bg-muted text-sm" 
+                  onClick={() => setQty((q) => Math.max(1, q - 1))}
+                >
+                  -
+                </button>
+                <div className="w-10 text-center text-sm">{qty}</div>
+                <button 
+                  className="rounded-md border px-3 py-1.5 hover:bg-muted text-sm" 
+                  onClick={() => setQty((q) => q + 1)}
+                >
+                  +
+                </button>
               </div>
             </div>
           </div>
 
           <div className="mt-6 flex flex-col sm:flex-row gap-3">
             <button
-              className="w-full sm:w-auto rounded-md bg-primary px-6 py-3 text-primary-foreground font-medium transform transition-transform hover:-translate-y-0.5 active:translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:flex-1 rounded-md bg-primary px-4 md:px-6 py-3 text-primary-foreground font-medium text-sm md:text-base transform transition-transform hover:-translate-y-0.5 active:translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={product.stock_quantity === 0}
               onClick={() => {
                 add({ 
@@ -166,34 +184,39 @@ export default function ProductDetails() {
               {product.stock_quantity > 0 ? 'Add to cart' : 'Out of Stock'}
             </button>
 
-            <Link to="/cart" className="w-full sm:w-auto rounded-md border px-6 py-3 flex items-center justify-center transition-colors hover:bg-accent">Go to cart</Link>
+            <Link 
+              to="/cart" 
+              className="w-full sm:flex-1 rounded-md border px-4 md:px-6 py-3 flex items-center justify-center text-sm md:text-base transition-colors hover:bg-accent"
+            >
+              Go to cart
+            </Link>
           </div>
 
           {/* Additional info */}
-          <div className="mt-8 grid gap-4">
-            <div className="rounded-lg border p-4">
-              <h4 className="font-semibold">Product details</h4>
-              <p className="text-sm text-muted-foreground mt-2">Concentration: Eau de Parfum. Cruelty-free. Hand-mixed batches.</p>
+          <div className="mt-6 md:mt-8 grid gap-3 md:gap-4">
+            <div className="rounded-lg border p-3 md:p-4">
+              <h4 className="font-semibold text-sm md:text-base">Product details</h4>
+              <p className="text-xs md:text-sm text-muted-foreground mt-2">Concentration: Eau de Parfum. Cruelty-free. Hand-mixed batches.</p>
             </div>
 
-            <div className="rounded-lg border p-4">
-              <h4 className="font-semibold">How to use</h4>
-              <p className="text-sm text-muted-foreground mt-2">Spray on pulse points and allow to dry naturally. Layer with matching body lotion for longevity.</p>
+            <div className="rounded-lg border p-3 md:p-4">
+              <h4 className="font-semibold text-sm md:text-base">How to use</h4>
+              <p className="text-xs md:text-sm text-muted-foreground mt-2">Spray on pulse points and allow to dry naturally. Layer with matching body lotion for longevity.</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Reviews & Related */}
-      <section className="mt-12">
-        <h2 className="font-display text-2xl mb-4">Customer Reviews</h2>
+      <section className="mt-10 md:mt-12">
+        <h2 className="font-display text-xl md:text-2xl mb-4">Customer Reviews</h2>
         {product.average_rating && (
           <div className="flex items-center gap-2 mb-4">
             <div className="flex">
               {[...Array(5)].map((_, i) => (
                 <svg
                   key={i}
-                  className={`w-5 h-5 ${i < Math.round(product.average_rating!) ? 'text-yellow-400' : 'text-gray-300'}`}
+                  className={`w-4 h-4 md:w-5 md:h-5 ${i < Math.round(product.average_rating!) ? 'text-yellow-400' : 'text-gray-300'}`}
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -201,19 +224,19 @@ export default function ProductDetails() {
                 </svg>
               ))}
             </div>
-            <span className="text-sm text-muted-foreground">
+            <span className="text-xs md:text-sm text-muted-foreground">
               {product.average_rating.toFixed(1)} out of 5
             </span>
           </div>
         )}
-        <div className="rounded-lg border p-4 text-center text-muted-foreground">
+        <div className="rounded-lg border p-4 text-center text-sm text-muted-foreground">
           <p>No reviews yet. Be the first to review this product!</p>
         </div>
 
         {relatedProducts.length > 0 && (
           <>
-            <h2 className="font-display text-2xl mt-10 mb-4">You may also like</h2>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <h2 className="font-display text-xl md:text-2xl mt-8 md:mt-10 mb-4">You may also like</h2>
+            <div className="grid gap-4 grid-cols-2 lg:grid-cols-3">
               {relatedProducts.map((p) => (
                 <ProductCard 
                   key={p.id} 
