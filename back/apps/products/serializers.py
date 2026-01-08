@@ -5,9 +5,11 @@ from .models import Category, Product, ProductImage
 
 class CategorySerializer(serializers.ModelSerializer):
     """Serializer for Category model"""
+    image = serializers.ReadOnlyField()  # Returns the image property (file or URL)
+    
     class Meta:
         model = Category
-        fields = ['id', 'name', 'slug', 'description']
+        fields = ['id', 'name', 'slug', 'description', 'image', 'image_url']
         read_only_fields = ['slug']
 
 

@@ -5,9 +5,30 @@ from .models import Category, Product, ProductImage
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ['name', 'slug']
+    list_display = ['name', 'slug', 'image_preview']
     search_fields = ['name']
     prepopulated_fields = {'slug': ('name',)}
+    readonly_fields = ['image_preview']
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('name', 'slug', 'description')
+        }),
+        ('Image - Choose ONE option', {
+            'fields': ('image_file', 'image_url', 'image_preview'),
+            'description': 'Upload an image from your computer OR provide an external URL. Uploaded files take priority.'
+        }),
+    )
+    
+    def image_preview(self, obj):
+        url = obj.image if hasattr(obj, 'image') else obj.image_url
+        if url:
+            return format_html(
+                '<img src="{}" style="max-width: 80px; max-height: 80px;" />',
+                url
+            )
+        return "No image"
+    image_preview.short_description = "Preview"
 
 
 class ProductImageInline(admin.StackedInline):

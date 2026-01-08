@@ -8,12 +8,34 @@ class Category(models.Model):
     slug = models.SlugField(max_length=100, unique=True, blank=True)
     description = models.TextField(blank=True)
     
+    # Option 1: URL-based image
+    image_url = models.URLField(
+        max_length=500,
+        blank=True,
+        help_text="URL of the category image (e.g., from CDN or external source)"
+    )
+    
+    # Option 2: File upload
+    image_file = models.ImageField(
+        upload_to='categories/',
+        blank=True,
+        null=True,
+        help_text="Upload category image from your computer"
+    )
+    
     class Meta:
         verbose_name_plural = 'Categories'
         ordering = ['name']
     
     def __str__(self):
         return self.name
+    
+    @property
+    def image(self):
+        """Return the image URL - prioritizes uploaded file over URL field"""
+        if self.image_file:
+            return self.image_file.url
+        return self.image_url or ''
     
     def save(self, *args, **kwargs):
         if not self.slug:
