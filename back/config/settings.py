@@ -82,6 +82,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_spectacular',
     'storages',
+    'cloudinary_storage',
+    'cloudinary',
     
     # Local apps
     'apps.products',
@@ -215,11 +217,17 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Cloudinary configuration (primary option for image uploads)
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME', default=None),
-    'API_KEY': config('CLOUDINARY_API_KEY', default=None),
-    'API_SECRET': config('CLOUDINARY_API_SECRET', default=None),
-}
+CLOUDINARY_CLOUD_NAME = config('CLOUDINARY_CLOUD_NAME', default=None)
+CLOUDINARY_API_KEY = config('CLOUDINARY_API_KEY', default=None)
+CLOUDINARY_API_SECRET = config('CLOUDINARY_API_SECRET', default=None)
+
+if CLOUDINARY_CLOUD_NAME:
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': CLOUDINARY_CLOUD_NAME,
+        'API_KEY': CLOUDINARY_API_KEY,
+        'API_SECRET': CLOUDINARY_API_SECRET,
+    }
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Railway S3-compatible storage for media files (alternative option)
 AWS_S3_ENDPOINT_URL = config('AWS_S3_ENDPOINT_URL', default=None)
@@ -234,12 +242,8 @@ AWS_QUERYSTRING_AUTH = True  # Use signed URLs for private bucket
 AWS_S3_URL_PROTOCOL = 'https:'
 AWS_QUERYSTRING_EXPIRE = 3600  # URLs expire in 1 hour
 
-# Use Cloudinary for media storage if configured (preferred)
-if CLOUDINARY_STORAGE['CLOUD_NAME']:
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    INSTALLED_APPS += ['cloudinary_storage', 'cloudinary']
-# Otherwise use S3 if configured
-elif AWS_S3_ENDPOINT_URL:
+# Use S3 if configured and Cloudinary is not
+if AWS_S3_ENDPOINT_URL and not CLOUDINARY_CLOUD_NAME:
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     MEDIA_URL = f'{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/'
 
