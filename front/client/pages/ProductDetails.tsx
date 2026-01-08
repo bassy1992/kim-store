@@ -80,65 +80,70 @@ export default function ProductDetails() {
   }
 
   return (
-    <main className="container px-4 py-8 md:py-16 animate-fade-in">
-      <div className="grid gap-6 md:gap-8 lg:grid-cols-2">
+    <main className="container py-6 md:py-12 animate-fade-in">
+      <div className="grid gap-6 lg:gap-8 lg:grid-cols-2">
         {/* Gallery */}
-        <div className="w-full">
-          <div className="overflow-hidden rounded-xl md:rounded-2xl border shadow-lg animate-scale-in">
+        <div className="w-full min-w-0">
+          <div className="overflow-hidden rounded-xl border shadow-lg">
             <img 
               src={image} 
               alt={product.name} 
-              className="w-full h-64 sm:h-80 md:h-96 lg:h-[480px] object-cover transition-transform duration-500" 
+              className="w-full aspect-square object-cover" 
             />
           </div>
 
-          <div className="mt-3 md:mt-4 flex gap-2 md:gap-3 overflow-x-auto py-1 -mx-1 px-1">
-            {productImages.map((src, i) => (
-              <button
-                key={i}
-                onClick={() => setImgIndex(i)}
-                className={`flex-shrink-0 w-16 h-16 md:w-20 md:h-20 overflow-hidden rounded-lg border transition-transform duration-200 ${i === imgIndex ? "ring-2 ring-primary scale-105" : "opacity-80 hover:opacity-100 hover:scale-105"}`}
-              >
-                <img src={src} alt={`${product.name} ${i + 1}`} className="h-full w-full object-cover" />
-              </button>
-            ))}
-          </div>
+          {productImages.length > 1 && (
+            <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
+              {productImages.map((src, i) => (
+                <button
+                  key={i}
+                  onClick={() => setImgIndex(i)}
+                  className={`flex-shrink-0 w-16 h-16 overflow-hidden rounded-lg border-2 ${i === imgIndex ? "border-primary" : "border-transparent opacity-70 hover:opacity-100"}`}
+                >
+                  <img src={src} alt={`${product.name} ${i + 1}`} className="h-full w-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Details */}
-        <div className="space-y-4 animate-slide-up">
-          <div className="flex items-center gap-2 flex-wrap">
-            <Link to="/shop" className="text-sm text-muted-foreground hover:text-primary">Shop</Link>
-            <span className="text-muted-foreground">/</span>
-            <span className="text-sm text-muted-foreground truncate">{product.category?.name || 'Products'}</span>
+        <div className="space-y-4 min-w-0">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Link to="/shop" className="hover:text-primary">Shop</Link>
+            <span>/</span>
+            <span className="truncate">{product.category?.name || 'Products'}</span>
           </div>
           
-          <h1 className="font-display text-2xl md:text-3xl">{product.name}</h1>
+          <h1 className="font-display text-2xl md:text-3xl break-words">{product.name}</h1>
           
-          <div className="flex flex-wrap items-center gap-3 md:gap-4">
-            <div className="text-xl md:text-2xl font-semibold">₵{parseFloat(product.price).toFixed(2)}</div>
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-xl md:text-2xl font-semibold">₵{parseFloat(product.price).toFixed(2)}</span>
             {product.stock_quantity > 0 ? (
-              <span className="text-xs md:text-sm text-green-600 font-medium">In Stock ({product.stock_quantity})</span>
+              <span className="text-sm text-green-600 font-medium">In Stock</span>
             ) : (
-              <span className="text-xs md:text-sm text-red-600 font-medium">Out of Stock</span>
+              <span className="text-sm text-red-600 font-medium">Out of Stock</span>
             )}
           </div>
 
           {product.tag && (
-            <div className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-xs md:text-sm font-medium">
+            <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
               {product.tag}
-            </div>
+            </span>
           )}
 
-          <p className="text-sm md:text-base text-muted-foreground">{product.description || "A refined composition blending floral and woody accords with excellent longevity."}</p>
+          <p className="text-sm md:text-base text-muted-foreground break-words">
+            {product.description || "A refined composition blending floral and woody accords with excellent longevity."}
+          </p>
 
-          <div className="flex flex-col gap-3 mt-4">
-            <div className="flex items-center gap-2">
-              <label className="text-sm text-muted-foreground min-w-[50px]">Size</label>
+          {/* Size & Quantity */}
+          <div className="space-y-3 pt-2">
+            <div className="flex items-center gap-3">
+              <label className="text-sm text-muted-foreground w-12">Size</label>
               <select 
                 value={size} 
                 onChange={(e) => setSize(e.target.value)} 
-                className="flex-1 max-w-[150px] rounded-md border px-3 py-2 text-sm transition-shadow hover:shadow-sm"
+                className="flex-1 max-w-[140px] rounded-md border px-3 py-2 text-sm"
               >
                 {sizeOptions.map((sizeOption) => (
                   <option key={sizeOption} value={sizeOption}>{sizeOption}</option>
@@ -146,18 +151,18 @@ export default function ProductDetails() {
               </select>
             </div>
 
-            <div className="flex items-center gap-2">
-              <label className="text-sm text-muted-foreground min-w-[50px]">Qty</label>
-              <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
+              <label className="text-sm text-muted-foreground w-12">Qty</label>
+              <div className="flex items-center">
                 <button 
-                  className="rounded-md border px-3 py-1.5 hover:bg-muted text-sm" 
+                  className="w-9 h-9 rounded-l-md border flex items-center justify-center hover:bg-muted" 
                   onClick={() => setQty((q) => Math.max(1, q - 1))}
                 >
                   -
                 </button>
-                <div className="w-10 text-center text-sm">{qty}</div>
+                <div className="w-12 h-9 border-t border-b flex items-center justify-center text-sm">{qty}</div>
                 <button 
-                  className="rounded-md border px-3 py-1.5 hover:bg-muted text-sm" 
+                  className="w-9 h-9 rounded-r-md border flex items-center justify-center hover:bg-muted" 
                   onClick={() => setQty((q) => q + 1)}
                 >
                   +
@@ -166,9 +171,10 @@ export default function ProductDetails() {
             </div>
           </div>
 
-          <div className="mt-6 flex flex-col sm:flex-row gap-3">
+          {/* Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 pt-4">
             <button
-              className="w-full sm:flex-1 rounded-md bg-primary px-4 md:px-6 py-3 text-primary-foreground font-medium text-sm md:text-base transform transition-transform hover:-translate-y-0.5 active:translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 rounded-md bg-primary px-4 py-3 text-primary-foreground font-medium disabled:opacity-50"
               disabled={product.stock_quantity === 0}
               onClick={() => {
                 add({ 
@@ -186,29 +192,29 @@ export default function ProductDetails() {
 
             <Link 
               to="/cart" 
-              className="w-full sm:flex-1 rounded-md border px-4 md:px-6 py-3 flex items-center justify-center text-sm md:text-base transition-colors hover:bg-accent"
+              className="flex-1 rounded-md border px-4 py-3 text-center hover:bg-accent"
             >
               Go to cart
             </Link>
           </div>
 
           {/* Additional info */}
-          <div className="mt-6 md:mt-8 grid gap-3 md:gap-4">
-            <div className="rounded-lg border p-3 md:p-4">
-              <h4 className="font-semibold text-sm md:text-base">Product details</h4>
-              <p className="text-xs md:text-sm text-muted-foreground mt-2">Concentration: Eau de Parfum. Cruelty-free. Hand-mixed batches.</p>
+          <div className="space-y-3 pt-4">
+            <div className="rounded-lg border p-4">
+              <h4 className="font-semibold text-sm">Product details</h4>
+              <p className="text-sm text-muted-foreground mt-1">Concentration: Eau de Parfum. Cruelty-free.</p>
             </div>
 
-            <div className="rounded-lg border p-3 md:p-4">
-              <h4 className="font-semibold text-sm md:text-base">How to use</h4>
-              <p className="text-xs md:text-sm text-muted-foreground mt-2">Spray on pulse points and allow to dry naturally. Layer with matching body lotion for longevity.</p>
+            <div className="rounded-lg border p-4">
+              <h4 className="font-semibold text-sm">How to use</h4>
+              <p className="text-sm text-muted-foreground mt-1">Spray on pulse points and allow to dry naturally.</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Reviews & Related */}
-      <section className="mt-10 md:mt-12">
+      <section className="mt-10">
         <h2 className="font-display text-xl md:text-2xl mb-4">Customer Reviews</h2>
         {product.average_rating && (
           <div className="flex items-center gap-2 mb-4">
@@ -216,7 +222,7 @@ export default function ProductDetails() {
               {[...Array(5)].map((_, i) => (
                 <svg
                   key={i}
-                  className={`w-4 h-4 md:w-5 md:h-5 ${i < Math.round(product.average_rating!) ? 'text-yellow-400' : 'text-gray-300'}`}
+                  className={`w-4 h-4 ${i < Math.round(product.average_rating!) ? 'text-yellow-400' : 'text-gray-300'}`}
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -224,7 +230,7 @@ export default function ProductDetails() {
                 </svg>
               ))}
             </div>
-            <span className="text-xs md:text-sm text-muted-foreground">
+            <span className="text-sm text-muted-foreground">
               {product.average_rating.toFixed(1)} out of 5
             </span>
           </div>
@@ -235,7 +241,7 @@ export default function ProductDetails() {
 
         {relatedProducts.length > 0 && (
           <>
-            <h2 className="font-display text-xl md:text-2xl mt-8 md:mt-10 mb-4">You may also like</h2>
+            <h2 className="font-display text-xl md:text-2xl mt-8 mb-4">You may also like</h2>
             <div className="grid gap-4 grid-cols-2 lg:grid-cols-3">
               {relatedProducts.map((p) => (
                 <ProductCard 
