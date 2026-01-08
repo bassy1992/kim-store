@@ -166,17 +166,21 @@ export default function Shop() {
                   }`}
                 >
                   <div className="w-20 h-20 sm:w-24 sm:h-24 bg-muted">
-                    {cat.image ? (
+                    {cat.image && cat.image.length > 0 ? (
                       <img
                         src={cat.image}
                         alt={cat.name}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        onError={(e) => {
+                          // Fallback if image fails to load
+                          (e.target as HTMLImageElement).style.display = 'none';
+                          (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                        }}
                       />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20 flex items-center justify-center">
-                        <span className="text-2xl font-bold text-muted-foreground/50">{cat.name.charAt(0)}</span>
-                      </div>
-                    )}
+                    ) : null}
+                    <div className={`w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20 flex items-center justify-center ${cat.image && cat.image.length > 0 ? 'hidden' : ''}`}>
+                      <span className="text-2xl font-bold text-muted-foreground/50">{cat.name.charAt(0)}</span>
+                    </div>
                   </div>
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2">
                     <span className="text-white text-xs font-medium truncate block">{cat.name}</span>
