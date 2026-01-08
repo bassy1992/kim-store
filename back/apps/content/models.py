@@ -296,7 +296,6 @@ class DupeProduct(models.Model):
         if self.designer_image_file:
             return self.designer_image_file.url
         return self.designer_image_url or 'https://via.placeholder.com/300x300?text=Designer+Fragrance'
-        return self.image_url or 'https://via.placeholder.com/300x300?text=Dupe+Product'
     
     def save(self, *args, **kwargs):
         if not self.slug:

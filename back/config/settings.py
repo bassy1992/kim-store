@@ -214,7 +214,14 @@ STATICFILES_DIRS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Railway S3-compatible storage for media files
+# Cloudinary configuration (primary option for image uploads)
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME', default=None),
+    'API_KEY': config('CLOUDINARY_API_KEY', default=None),
+    'API_SECRET': config('CLOUDINARY_API_SECRET', default=None),
+}
+
+# Railway S3-compatible storage for media files (alternative option)
 AWS_S3_ENDPOINT_URL = config('AWS_S3_ENDPOINT_URL', default=None)
 AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID', default=None)
 AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY', default=None)
@@ -227,8 +234,12 @@ AWS_QUERYSTRING_AUTH = True  # Use signed URLs for private bucket
 AWS_S3_URL_PROTOCOL = 'https:'
 AWS_QUERYSTRING_EXPIRE = 3600  # URLs expire in 1 hour
 
-# Use S3 for media storage if configured
-if AWS_S3_ENDPOINT_URL:
+# Use Cloudinary for media storage if configured (preferred)
+if CLOUDINARY_STORAGE['CLOUD_NAME']:
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    INSTALLED_APPS += ['cloudinary_storage', 'cloudinary']
+# Otherwise use S3 if configured
+elif AWS_S3_ENDPOINT_URL:
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     MEDIA_URL = f'{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/'
 
