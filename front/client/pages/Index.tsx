@@ -322,21 +322,9 @@ export default function Index() {
               </div>
             ) : categoriesData && categoriesData.length > 0 ? (
               categoriesData.map((category, i) => {
-                // Map category images based on category name
-                const categoryImages: Record<string, string> = {
-                  'floral': "https://images.unsplash.com/photo-1490750967868-88aa4486c946?q=80&w=800&auto=format&fit=crop",
-                  'woody': "https://images.unsplash.com/photo-1615529182904-14819c35db37?q=80&w=800&auto=format&fit=crop",
-                  'citrus': "https://images.unsplash.com/photo-1582979512210-99b6a53386f9?q=80&w=800&auto=format&fit=crop",
-                  'oriental': "https://images.unsplash.com/photo-1602874801006-e04b6d0c5d85?q=80&w=800&auto=format&fit=crop",
-                  'fresh': "https://images.unsplash.com/photo-1588405748880-12d1d2a59d75?q=80&w=800&auto=format&fit=crop",
-                  'spicy': "https://images.unsplash.com/photo-1596040033229-a0b3b7d1f4b8?q=80&w=800&auto=format&fit=crop",
-                  'perfumes': "https://images.unsplash.com/photo-1541643600914-78b084683601?q=80&w=800&auto=format&fit=crop",
-                  'perfume oils': "https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=800&auto=format&fit=crop",
-                  'air ambience': "https://images.unsplash.com/photo-1602874801006-e04b6d0c5d85?q=80&w=800&auto=format&fit=crop",
-                };
-                
+                // Use uploaded image, fallback to default
                 const defaultImage = "https://images.unsplash.com/photo-1541643600914-78b084683601?q=80&w=800&auto=format&fit=crop";
-                const categoryImage = categoryImages[category.name.toLowerCase()] || defaultImage;
+                const categoryImage = category.image && category.image.length > 0 ? category.image : defaultImage;
                 
                 return (
                   <Link
@@ -349,6 +337,9 @@ export default function Index() {
                       src={categoryImage}
                       alt={category.name}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = defaultImage;
+                      }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
