@@ -15,6 +15,7 @@ interface DupeProduct {
   designer_brand: string;
   designer_fragrance: string;
   designer_price: string;
+  designer_image: string | null;
   similarity_percentage: number;
   image: string | null;
   is_featured: boolean;
@@ -224,10 +225,20 @@ export default function Dupes() {
                     Designer Original
                   </span>
                   <div className="flex items-start gap-4">
-                    <div className="w-16 h-16 rounded-lg bg-muted flex items-center justify-center">
-                      <span className="text-lg font-bold text-muted-foreground">
-                        {product.designer_brand.charAt(0)}
-                      </span>
+                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted">
+                      {product.designer_image ? (
+                        <img 
+                          src={product.designer_image} 
+                          alt={`${product.designer_brand} ${product.designer_fragrance}`}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <span className="text-lg font-bold text-muted-foreground">
+                            {product.designer_brand.charAt(0)}
+                          </span>
+                        </div>
+                      )}
                     </div>
                     <div className="flex-1">
                       <p className="text-sm text-muted-foreground">{product.designer_brand}</p>
