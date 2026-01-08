@@ -16,7 +16,7 @@
 
 ### Step 2: Check These Railway Variables
 
-Make sure ALL of these are set:
+Make sure ALL of these are set::
 
 ```
 SECRET_KEY=your-generated-secret-key

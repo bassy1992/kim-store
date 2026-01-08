@@ -57,7 +57,6 @@ export default function Shop() {
   });
 
   const products = productsData?.results || [];
-  const categories = ["All", ...(Array.isArray(categoriesData) ? categoriesData.map(c => c.name) : [])];
   
   const sortOptions = [
     { value: "featured", label: "Featured" },
@@ -122,35 +121,66 @@ export default function Shop() {
       <div className="container py-8 md:py-12">
         {/* Filters & Controls */}
         <div className="mb-8 space-y-6">
-          {/* Category Pills */}
-          <div className="space-y-2">
-            <span className="text-sm font-medium text-muted-foreground block md:inline">Categories:</span>
-            <div className="flex overflow-x-auto gap-2 pb-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
-              {categories.map((cat) => (
+          {/* Category Cards with Images */}
+          <div className="space-y-3">
+            <span className="text-sm font-medium text-muted-foreground">Categories:</span>
+            <div className="flex overflow-x-auto gap-3 pb-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
+              {/* All Category Button */}
+              <button
+                onClick={() => {
+                  setFilterBy('all');
+                  const newParams = new URLSearchParams(searchParams);
+                  newParams.delete('category');
+                  setSearchParams(newParams);
+                }}
+                className={`group relative flex-shrink-0 rounded-xl overflow-hidden transition-all duration-300 ${
+                  filterBy === 'all'
+                    ? "ring-2 ring-primary ring-offset-2 shadow-lg"
+                    : "hover:shadow-md"
+                }`}
+              >
+                <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+                  <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                  </svg>
+                </div>
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2">
+                  <span className="text-white text-xs font-medium">All</span>
+                </div>
+              </button>
+              
+              {/* Category Cards */}
+              {Array.isArray(categoriesData) && categoriesData.map((cat) => (
                 <button
-                  key={cat}
+                  key={cat.id}
                   onClick={() => {
-                    const newFilter = cat.toLowerCase() === 'all' ? 'all' : cat.toLowerCase();
-                    setFilterBy(newFilter);
-                    // Update URL params for category filter
+                    setFilterBy(cat.name.toLowerCase());
                     const newParams = new URLSearchParams(searchParams);
-                    if (newFilter !== 'all') {
-                      newParams.set('category', newFilter);
-                    } else {
-                      newParams.delete('category');
-                    }
+                    newParams.set('category', cat.name.toLowerCase());
                     setSearchParams(newParams);
                   }}
-                  className={`group relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap flex-shrink-0 ${
-                    filterBy === cat.toLowerCase()
-                      ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
-                      : "bg-muted/50 hover:bg-muted text-foreground"
+                  className={`group relative flex-shrink-0 rounded-xl overflow-hidden transition-all duration-300 ${
+                    filterBy === cat.name.toLowerCase()
+                      ? "ring-2 ring-primary ring-offset-2 shadow-lg"
+                      : "hover:shadow-md"
                   }`}
                 >
-                  {cat}
-                  {filterBy === cat.toLowerCase() && (
-                    <div className="absolute inset-0 rounded-full bg-primary/20 animate-pulse" />
-                  )}
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 bg-muted">
+                    {cat.image ? (
+                      <img
+                        src={cat.image}
+                        alt={cat.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20 flex items-center justify-center">
+                        <span className="text-2xl font-bold text-muted-foreground/50">{cat.name.charAt(0)}</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2">
+                    <span className="text-white text-xs font-medium truncate block">{cat.name}</span>
+                  </div>
                 </button>
               ))}
             </div>
